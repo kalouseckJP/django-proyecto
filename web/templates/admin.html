@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Menu</title>
+    <link rel="stylesheet" href="{% static "style.css" %}">
+    <script src="{% static "script.js" %}"></script>
+</head>
+<body class="admin">
+    <h1>Menú Admin</h1>
+        <!-- Menu mostrando los elementos actuales -->
+    <h2>Menú</h2>
+    <ul class="menu">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="productos.html">Productos</a></li>
+        <li><a href="clientes.html">Clientes</a></li>
+        <li><a href="ventas.html">Ventas</a></li>
+    </ul>
+    <h2>Opciones</h2>
+    <div id="admin-options">
+        <nav>
+            <ul>
+                <li><button type="button">Productos</button></li>
+                <li><button type="button">Clientes</button></li>
+                <li><button type="button">Ventas</button></li>
+            </ul>
+        </nav>
+        <div id="admin-content">
+            <h3>Contenido de Administración</h3>
+            <p>Aquí van gestionar los productos, clientes y ventas.</p>
+        </div>
+    </div>
+    <input type="submit" value="Salir" onclick="inicio()">
+</body>
+</html>
