@@ -196,6 +196,14 @@ body.admin.authenticated {
     color: green
 }
 
+#admin-content-header #add i {
+    padding: 0;
+}
+
+#admin-content p {
+    height: 60vh;
+}
+
 /* Pagina frontal */
 
 .frente{
@@ -206,7 +214,7 @@ body.admin.authenticated {
     margin: 0;
 }
 
-.frente div#banner {
+.frente header#banner {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -218,18 +226,18 @@ body.admin.authenticated {
     border-end-start-radius: 15px;
 }
 
-.frente div#banner * {
+.frente header#banner * {
     width: 50%;
     text-align: center;
 }
 
-.frente div#divLogin {
+.frente header#divLogin {
     display: flex;
     justify-content: right;
     margin-right: 5vh;
 }
 
-.frente div#banner button {
+.frente header#banner button {
     width: 50%;
     padding: 10px 20px;
     text-align: center;

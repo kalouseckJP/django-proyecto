@@ -11,15 +11,15 @@
     <script src="{% static "script.js" %}"></script>
 </head>
 <body class="frente">
-    <div id="banner">
+    <header id="banner">
         <h1>Menú Principal</h1>
         <div id="divLogin">
             <button type="button" onclick="window.location.href='{% url "index" %}'">Admin</button>
         </div>
-    </div>
+    </header>
     <div id="columna_principal">
         <h2>Bienvenido a las reservas</h2>
-        <img src="{% static "img\large.png" %}" height="max-content" width="max-content" alt="mapa">
+        <img src="{% static "img\large.png" %}" height="600" width="800" alt="mapa">
     </div>
 </body>
 </html>
