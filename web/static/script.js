@@ -16,7 +16,7 @@ function validateForm() {
 }
 
 function inicio() {
-    window.location.href = "/index.html";
+    window.location.href = "/";
     return false;
 }
 
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const cookies = document.cookie.split(";").map(cookie => cookie.trim());
         const isLoggedIn = cookies.some(cookie => cookie.startsWith("loggedIn=true"));
         if (!isLoggedIn) {
-            window.location.href = "/index.html";
+            window.location.href = "/";
         }
 else {
             document.body.classList.add("authenticated"); // Show content if authenticated
@@ -40,3 +40,30 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    const buttons = document.querySelectorAll("nav button");
+    const adminContent = document.getElementById("admin-content");
+
+    buttons.forEach(button => {
+        button.addEventListener("click", function () {
+            const value = this.value;
+            let content = "";
+
+            switch (value) {
+                case "Productos":
+                    content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
+                    break;
+                case "Clientes":
+                    content = "<div id='admin-content-header'><h3>Gestion de Clientes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los clientes.</p>";
+                    break;
+                case "Ventas":
+                    content = "<div id='admin-content-header'><h3>Gestion de Ventas</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los ventas.</p>";
+                    break;
+                default:    
+                    content = "<h3>Contenido de Administración</h3><p>Aquí van gestionar los productos, clientes y ventas.</p>";
+            }
+
+            adminContent.innerHTML = content;
+        });
+    });
+});

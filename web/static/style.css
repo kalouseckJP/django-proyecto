@@ -98,7 +98,6 @@ body.admin.authenticated {
 .admin #admin-options {
     display: flex;
     background-color: #f8f9fa;
-    gap: 10px;
     border-radius: 20px;
     border: #1E1E1E solid 1px;
     padding: 0;
@@ -144,11 +143,58 @@ body.admin.authenticated {
     background-color: #c4c4c4;
 }
 
+.admin input[type="submit"]#admin-salida {
+    background-color: #2C2C2C;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 15px 0px;
+    border-radius: 5px;
+}
+
+.admin input[type="submit"]#admin-salida:hover {
+    background-color: #1E1E1E;
+    color: #D9D9D9;
+}
+
 @media screen and (max-width: 600px) {
     .admin #admin-options nav{
         width: max-content;
     }
-}   
+}
+
+#admin-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+#admin-content * {
+    padding: 0 10px;
+}
+
+#admin-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    border-bottom: black solid 1px;
+}
+
+#admin-content-header h3 {
+    padding: 0;
+}
+
+#admin-content-header #add {
+    width: max-content;
+    text-align: center;
+    background-color: #63e163;
+    color: green
+}
 
 /* Pagina frontal */
 

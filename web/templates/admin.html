@@ -4,34 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin menu for managing products, clients, and sales.">
+    <meta name="keywords" content="admin, menu, products, clients, sales, management">
     <title>Admin Menu</title>
     <link rel="stylesheet" href="{% static "style.css" %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="{% static "script.js" %}"></script>
 </head>
 <body class="admin">
     <h1>Menú Admin</h1>
-        <!-- Menu mostrando los elementos actuales -->
-    <h2>Menú</h2>
-    <ul class="menu">
-        <li><a href="index.html">Inicio</a></li>
-        <li><a href="productos.html">Productos</a></li>
-        <li><a href="clientes.html">Clientes</a></li>
-        <li><a href="ventas.html">Ventas</a></li>
-    </ul>
+    <!-- Menu mostrando los elementos actuales -->
     <h2>Opciones</h2>
     <div id="admin-options">
         <nav>
             <ul>
-                <li><button type="button">Productos</button></li>
-                <li><button type="button">Clientes</button></li>
-                <li><button type="button">Ventas</button></li>
+                <li><button type="button" value="Productos">Productos</button></li>
+                <li><button type="button" value="Clientes">Clientes</button></li>
+                <li><button type="button" value="Ventas">Ventas</button></li>
             </ul>
         </nav>
         <div id="admin-content">
-            <h3>Contenido de Administración</h3>
+            <div id="admin-content-header">
+                <h3>Contenido de Administración</h3>
+            </div>
             <p>Aquí van gestionar los productos, clientes y ventas.</p>
         </div>
     </div>
-    <input type="submit" value="Salir" onclick="inicio()">
+    <input id="admin-salida" type="submit" value="Salir" onclick="inicio()">
 </body>
 </html>

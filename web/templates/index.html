@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Página de inicio de sesión para el sistema de reservas.">
+    <meta name="keywords" content="reservas, inicio de sesión, sistema, usuario, contraseña">
     <title>Inicio de Sesión - Reservas</title>
     <link rel="stylesheet" href="{% static "style.css" %}">
     <script src="{% static "script.js" %}"></script>
@@ -21,7 +23,7 @@
             
             <input type="submit" value="Iniciar Sesión" name="loginForm" id="submit" onclick="return validateForm()">
         </form>
-        <input type="button" value="Cancelar" id="cancelar" onclick="window.location.href='front.html'">
+        <input type="button" value="Cancelar" id="cancelar" onclick="window.location.href='{% url 'front' %}'">
     </div>
 </body>
 </html>

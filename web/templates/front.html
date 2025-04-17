@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Welcome to the reservation system. Manage your bookings efficiently.">
+    <meta name="keywords" content="reservations, booking, admin, system">
     <title>Frente</title>
     <link rel="stylesheet" href="{% static "style.css" %}">
     <script src="{% static "script.js" %}"></script>
@@ -12,12 +14,12 @@
     <div id="banner">
         <h1>Menú Principal</h1>
         <div id="divLogin">
-            <button type="button" onclick="window.location.href='/index.html'">Admin</button>
+            <button type="button" onclick="window.location.href='{% url "index" %}'">Admin</button>
         </div>
     </div>
     <div id="columna_principal">
         <h2>Bienvenido a las reservas</h2>
-        <img src="{% static "img\large.png" %}" alt="mapa">
+        <img src="{% static "img\large.png" %}" height="max-content" width="max-content" alt="mapa">
     </div>
 </body>
 </html>
