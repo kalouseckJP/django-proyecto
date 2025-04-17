@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from datetime import datetime, date
+from .models import Espacios
 
 # Create your views here.
 def index(request):
@@ -9,3 +11,9 @@ def admin(request):
 
 def front(request):
     return render(request, 'front.html')
+
+def hacer_reserva(request):
+    today = date.today().isoformat() # AAAA-MM-DD
+    now = datetime.now().strftime('%H:%M') # HH:MM
+    lugares = Espacios.objects.all()
+    return render(request, 'reservaciones.html', {'today': today, 'now': now, 'lugares': lugares})

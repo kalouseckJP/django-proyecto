@@ -23,4 +23,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('admin', views.admin, name='admin'),
     path('front', views.front, name='front'),
+    path('reservaciones', views.hacer_reserva, name='reservaciones'),
 ]

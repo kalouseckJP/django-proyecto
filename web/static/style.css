@@ -208,8 +208,6 @@ body.admin.authenticated {
 
 .frente{
     background-color: #fddcad;
-    font-family: Arial, sans-serif;
-    color: #333;
     padding: 0;
     margin: 0;
 }
@@ -252,9 +250,95 @@ body.admin.authenticated {
     margin-left: 5vh;
     margin-right: 5vh;
     background-color: #f8f9fa;
+    align-items: center;
 }
 
-.frente #columna_principal *{
+/* Hacer reservaciones */
+.hacer-reservacion {
+    background-color: #fddcad;
+    padding: 0;
+    margin: 0;
+}
+
+.hacer-reservacion #columna_principal {
+    display: flex;
+    flex-direction: column;
     margin-left: 5vh;
     margin-right: 5vh;
+    background-color: #f8f9fa;
+    align-items: center;
+}
+
+.hacer-reservacion header#banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10vh;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(220, 159, 80);
+    border-end-end-radius: 15px;
+    border-end-start-radius: 15px;
+}
+
+.hacer-reservacion header#banner * {
+    width: 50%;
+    text-align: center;
+}
+
+.hacer-reservacion header#divLogin {
+    display: flex;
+    justify-content: right;
+    margin-right: 5vh;
+}
+
+.hacer-reservacion #banner button {
+    width: 50%;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 5px;
+}
+
+.hacer-reservacion form#reservacionForm {
+    display: flex;
+    flex-direction: column;
+    background-color: #f9f9f9;
+    padding: 20px 50px;
+    border-radius: 20px;
+    border: #1E1E1E solid 1px;
+}
+
+.hacer-reservacion form#reservacionForm input{
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.hacer-reservacion form#reservacionForm input[type="submit"] {
+    background-color: #2C2C2C;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 5px;
+}
+
+.hacer-reservacion form#reservacionForm input[type="submit"]:hover {
+    background-color: #1E1E1E;
+    color: #D9D9D9;
+}
+
+.hacer-reservacion form#reservacionForm select#lugar{
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
 }
