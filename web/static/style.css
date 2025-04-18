@@ -253,6 +253,19 @@ body.admin.authenticated {
     align-items: center;
 }
 
+.frente #columna_principal button {
+    background-color: #2C2C2C;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 0 0 50px 0;
+    border-radius: 5px;
+}
+
 /* Hacer reservaciones */
 .hacer-reservacion {
     background-color: #fddcad;
@@ -308,6 +321,7 @@ body.admin.authenticated {
     padding: 20px 50px;
     border-radius: 20px;
     border: #1E1E1E solid 1px;
+    margin: 0 0 50px 0 ;
 }
 
 .hacer-reservacion form#reservacionForm input{
@@ -341,4 +355,32 @@ body.admin.authenticated {
     border-radius: 5px;
     border: 1px solid #ccc;
     width: 100%;
+}
+
+.hacer-reservacion input[type="button"]#cancelar {
+    background-color: #D9D9D9;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 5px;
+}
+
+.hacer-reservacion input[type="button"]#cancelar:hover {
+    background-color: #B0B0B0;
+    color: #D9D9D9;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10vh;
+    background-color: rgb(220, 159, 80);
+    border-start-end-radius: 15px;
+    border-start-start-radius: 15px;
 }
