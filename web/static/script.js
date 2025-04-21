@@ -63,7 +63,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     content = "<h3>Contenido de Administración</h3><p>Aquí van gestionar los productos, clientes y ventas.</p>";
             }
 
-            adminContent.innerHTML = content;
         });
     });
 });

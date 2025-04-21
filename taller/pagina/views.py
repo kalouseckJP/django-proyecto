@@ -1,13 +1,15 @@
 from django.shortcuts import render
 from datetime import datetime, date
-from .models import Espacios
+from .models import Espacios, Reserva, Cliente
 
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
 
 def admin(request):
-    return render(request, 'admin.html')
+    reservas = Reserva.objects.all()
+    clientes = Cliente.objects.all()
+    return render(request, 'admin.html', {'reservas': reservas, 'clientes': clientes})
 
 def front(request):
     return render(request, 'front.html')
