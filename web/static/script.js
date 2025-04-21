@@ -42,22 +42,30 @@ document.addEventListener("DOMContentLoaded", function() {
 
 document.addEventListener("DOMContentLoaded", function () {
     const buttons = document.querySelectorAll("nav button");
-    const adminContent = document.getElementById("admin-content");
+    const adminContent = document.getElementsByClassName("admin-content")[0];
 
     buttons.forEach(button => {
         button.addEventListener("click", function () {
             const value = this.value;
             let content = "";
+             test = "";
 
             switch (value) {
                 case "Productos":
-                    content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
+                    adminContent.style.display = "none";
+                    document.getElementById("reservas-content").style.display = "block";
+                    document.getElementById("clientes-content").style.display = "none";
+                    // content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
                     break;
                 case "Clientes":
-                    content = "<div id='admin-content-header'><h3>Gestion de Clientes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los clientes.</p>";
+                    adminContent.style.display = "none";
+                    document.getElementById("reservas-content").style.display = "none";
+                    document.getElementById("clientes-content").style.display = "block";
+                    // content = "<div id='admin-content-header'><h3>Gestion de Clientes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los clientes.</p>";
                     break;
-                case "Ventas":
+                case "Mesas":
                     content = "<div id='admin-content-header'><h3>Gestion de Ventas</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los ventas.</p>";
+                    adminContent.innerHTML = content;
                     break;
                 default:    
                     content = "<h3>Contenido de Administración</h3><p>Aquí van gestionar los productos, clientes y ventas.</p>";

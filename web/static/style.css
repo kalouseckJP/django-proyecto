@@ -161,20 +161,19 @@ body.admin.authenticated {
     color: #D9D9D9;
 }
 
-@media screen and (max-width: 600px) {
-    .admin #admin-options nav{
-        width: max-content;
-    }
-}
-
-#admin-content {
+.admin-content {
     display: flex;
     flex-direction: column;
     width: 100%;
+    overflow: hidden;
 }
 
-#admin-content * {
+.admin-content * {
     padding: 0 10px;
+}
+
+.admin-content#reservas-content, .admin-content#clientes-content {
+    display: none;
 }
 
 #admin-content-header {
@@ -200,11 +199,50 @@ body.admin.authenticated {
     padding: 0;
 }
 
-#admin-content p {
-    height: 60vh;
+
+#admin-content-titles {
+    overflow-x: auto;
 }
 
+table#reservas-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table#reservas-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    background-color: #f2f2f2;
+    color: black;
+}
+
+table#reservas-table tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+table#reservas-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+table#reservas-table tr:hover {
+    background-color: #ddd;
+}
+
+table#reservas-table th, table#reservas-table td {
+    padding: 12px;
+    text-align: center;
+}
+
+
 /* Pagina frontal */
+
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
 
 .frente{
     background-color: #fddcad;
@@ -212,7 +250,11 @@ body.admin.authenticated {
     margin: 0;
 }
 
-.frente header#banner {
+header#banner, footer {
+    flex: 0;
+}
+
+header#banner {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -224,36 +266,52 @@ body.admin.authenticated {
     border-end-start-radius: 15px;
 }
 
-.frente header#banner * {
+header#banner * {
     width: 50%;
     text-align: center;
 }
 
-.frente header#divLogin {
+header#divLogin {
     display: flex;
     justify-content: right;
     margin-right: 5vh;
 }
 
-.frente header#banner button {
+header#banner button {
     width: 50%;
     padding: 10px 20px;
     text-align: center;
     font-size: 16px;
     margin: 4px 2px;
     border-radius: 5px;
+    border: 1px solid #1E1E1E;
 }
 
-.frente #columna_principal {
+header#banner button#menu {
+    background-color: transparent;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+header#banner button#menu *{
+    width: 100%;
+}
+
+#columna_principal {
     display: flex;
     flex-direction: column;
     margin-left: 5vh;
     margin-right: 5vh;
     background-color: #f8f9fa;
     align-items: center;
+    flex: 1;
 }
 
-.frente #columna_principal button {
+#columna_principal button {
     background-color: #2C2C2C;
     color: white;
     border: none;
@@ -262,7 +320,7 @@ body.admin.authenticated {
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 0 0 50px 0;
+    margin:2rem 0;
     border-radius: 5px;
 }
 
@@ -273,47 +331,6 @@ body.admin.authenticated {
     margin: 0;
 }
 
-.hacer-reservacion #columna_principal {
-    display: flex;
-    flex-direction: column;
-    margin-left: 5vh;
-    margin-right: 5vh;
-    background-color: #f8f9fa;
-    align-items: center;
-}
-
-.hacer-reservacion header#banner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 10vh;
-    margin: 0;
-    padding: 0;
-    background-color: rgb(220, 159, 80);
-    border-end-end-radius: 15px;
-    border-end-start-radius: 15px;
-}
-
-.hacer-reservacion header#banner * {
-    width: 50%;
-    text-align: center;
-}
-
-.hacer-reservacion header#divLogin {
-    display: flex;
-    justify-content: right;
-    margin-right: 5vh;
-}
-
-.hacer-reservacion #banner button {
-    width: 50%;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 16px;
-    margin: 4px 2px;
-    border-radius: 5px;
-}
-
 .hacer-reservacion form#reservacionForm {
     display: flex;
     flex-direction: column;
@@ -321,7 +338,7 @@ body.admin.authenticated {
     padding: 20px 50px;
     border-radius: 20px;
     border: #1E1E1E solid 1px;
-    margin: 0 0 50px 0 ;
+    margin: 2rem 0 ;
 }
 
 .hacer-reservacion form#reservacionForm input{
@@ -349,7 +366,7 @@ body.admin.authenticated {
     color: #D9D9D9;
 }
 
-.hacer-reservacion form#reservacionForm select#lugar{
+.hacer-reservacion form#reservacionForm select{
     padding: 10px;
     margin: 5px 0;
     border-radius: 5px;
@@ -383,4 +400,29 @@ footer {
     background-color: rgb(220, 159, 80);
     border-start-end-radius: 15px;
     border-start-start-radius: 15px;
+}
+
+img#mapa{
+    margin: 0 5px;
+}
+
+@media screen and (max-width: 900px) {
+    .admin #admin-options nav {
+        width: max-content;
+    }
+
+    header#banner, footer {
+        border-radius: 0;
+    }
+    
+    #columna_principal {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    img{
+        width: 95%;
+        height: auto;
+    }
 }

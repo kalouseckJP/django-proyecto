@@ -13,33 +13,48 @@
 </head>
 <body class="hacer-reservacion">
     <header id="banner">
-        <h1>Menú Principal</h1>
+        <button type="button" id="menu" onclick="window.location.href='{% url 'front' %}';"><h1>Menú Principal</h1></button>
         <div id="divLogin">
             <button type="button" onclick="window.location.href='{% url "index" %}';">Admin</button>
         </div>
     </header>
     <div id="columna_principal">
-        <img src="{% static "img\large.png" %}" height="600" width="800" alt="mapa">
-
         <h2>Hacer Reservaciones</h2>
+        <img src="{% static "img\large.png" %}" height="600" width="800" alt="mapa" id="mapa">
+
         <form action="" method="post" name="reservacionForm" id="reservacionForm">
             {% csrf_token %}
-            <label for="nombre">Nombre</label>
+            <label for="nombre">Nombre *</label>
             <input type="text" id="nombre" name="nombre" placeholder="Nombre" required><br>
 
-            <label for="apellido">Apellido</label>
+            <label for="apellido">Apellido *</label>
             <input type="text" id="apellido" name="apellido" placeholder="Apellido" required><br>
 
-            <label for="RUT">RUT</label>
+            <label for="RUT">RUT *</label>
             <input type="text" id="RUT" name="RUT" placeholder="RUT" required><br>
 
-            <label for="telefono">Teléfono</label>
+            <label for="telefono">Teléfono *</label>
             <input type="text" id="telefono" name="telefono" placeholder="Teléfono" required><br>
 
             <label for="correo">Correo Electrónico</label>
-            <input type="email" id="correo" name="correo" placeholder="Correo Electrónico"><br>
+            <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl"><br>
 
-            <label for="lugar">Lugar</label>
+            <label for="tipoEvento">Cantidad de personas *</label>
+            <select id="tipoEvento" name="tipoEvento" required>
+                <option value="" disabled selected>Seleccione la cantidad de personas</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+
+            <label for="lugar">Lugar *</label>
             <select id="lugar" name="lugar" required>
                 <option value="" disabled selected>Seleccione un lugar</option>
                 {% for lugar in lugares %}
@@ -47,10 +62,10 @@
                 {% endfor %}
             </select><br>
 
-            <label for="fecha">Fecha</label>
+            <label for="fecha">Fecha *</label>
             <input type="date" id="fecha" name="fecha" min="{{ today }}" value="{{ today }}"required><br>
 
-            <label for="hora">Hora</label>
+            <label for="hora">Hora *</label>
             <input type="time" id="hora" name="hora" value="{{ now }}" min="08:00" max="22:00" required><br>
 
             <input type="submit" value="Reservar" name="reservacionForm" id="submit" onclick="return validateForm()">

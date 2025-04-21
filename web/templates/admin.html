@@ -18,16 +18,91 @@
     <div id="admin-options">
         <nav>
             <ul>
-                <li><button type="button" value="Productos">Productos</button></li>
+                <li><button type="button" value="Productos">Reservas</button></li>
                 <li><button type="button" value="Clientes">Clientes</button></li>
-                <li><button type="button" value="Ventas">Ventas</button></li>
+                <li><button type="button" value="Mesas">Mesas</button></li>
             </ul>
         </nav>
-        <div id="admin-content">
+        <div class="admin-content">
             <div id="admin-content-header">
-                <h3>Contenido de Administración</h3>
+                <h3>Contenido de Administracion</h3>
+                
             </div>
-            <p>Aquí van gestionar los productos, clientes y ventas.</p>
+            <p>En esta sección puedes gestionar los productos, clientes y ventas.</p>
+        </div>
+        <div id="reservas-content" class="admin-content">
+            <div id="admin-content-header">
+                <h3>Reservas</h3>
+                <button type="button" id="add">
+                    <i class="bi bi-plus-circle"></i> Agregar
+                </button>
+            </div>
+            <div class="reservas" id="admin-content-titles">
+                <table id="reservas-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>RUT</th>
+                            <th>Teléfono</th>
+                            <th>Correo Electrónico</th>
+                            <th>Cantidad de Personas</th>
+                            <th>Lugar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservas-body">
+                        <!-- Aquí se llenarán las reservas desde la base de datos -->
+                        {% for reserva in reservas %}
+                        <tr>
+                            <td>{{ reserva.id }}</td>
+                            <td>{{ reserva.RUT.nombre }}</td>
+                            <td>{{ reserva.RUT.apellido }}</td>
+                            <td>{{ reserva.RUT.RUT }}</td>
+                            <td>{{ reserva.RUT.telefono }}</td>
+                            <td>{{ reserva.RUT.email }}</td>
+                            <td>{{ reserva.cantidad_personas }}</td>
+                            <td>{{ reserva.espacio }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="clientes-content" class="admin-content">
+            <div id="admin-content-header">
+                <h3>Clientes</h3>
+                <button type="button" id="add">
+                    <i class="bi bi-plus-circle"></i> Agregar
+                </button>
+            </div>
+            <div class="reservas" id="admin-content-titles">
+                <table id="reservas-table">
+                    <thead>
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Teléfono</th>
+                            <th>Correo Electrónico</th>
+                            <th>Visitas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservas-body">
+                        <!-- Aquí se llenarán las reservas desde la base de datos -->
+                        {% for cliente in clientes %}
+                        <tr>
+                            <td>{{ cliente.RUT }}</td>
+                            <td>{{ cliente.nombre }}</td>
+                            <td>{{ cliente.apellido }}</td>
+                            <td>{{ cliente.telefono }}</td>
+                            <td>{{ cliente.email }}</td>
+                            <td>{{ cliente.visitas }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <input id="admin-salida" type="submit" value="Salir" onclick="inicio()">
