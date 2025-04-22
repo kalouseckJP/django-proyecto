@@ -1,0 +1,16 @@
+<tr>
+    <td>{{ cliente.RUT }}</td>
+    <td>{{ cliente.nombre }}</td>
+    <td>{{ cliente.apellido }}</td>
+    <td>{{ cliente.telefono }}</td>
+    <td>{{ cliente.email }}</td>
+    <td>{{ cliente.visitas }}</td>
+    <td class="tabla-elem-final">
+        <button type="button" class="edit-button" data-id="{{ cliente.RUT }}" data-type="cliente">
+            <i class="bi bi-pencil-square"></i> Editar
+        </button>
+        <button type="button" class="delete-button" data-id="{{ cliente.RUT }}" data-type="cliente">
+            <i class="bi bi-trash"></i> Eliminar
+        </button>
+    </td>
+</tr>

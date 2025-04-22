@@ -1,0 +1,20 @@
+<tr>
+    <td>{{ reserva.id }}</td>
+    <td>{{ reserva.RUT.nombre }}</td>
+    <td>{{ reserva.RUT.apellido }}</td>
+    <td>{{ reserva.RUT.RUT }}</td>
+    <td>{{ reserva.RUT.telefono }}</td>
+    <td>{{ reserva.RUT.email }}</td>
+    <td>{{ reserva.fecha_reserva }}</td>
+    <td>{{ reserva.hora_inicio }}</td>
+    <td>{{ reserva.cantidad_personas }}</td>
+    <td>{{ reserva.espacio.nombre }}</td>
+    <td class="tabla-elem-final">
+        <button type="button" class="edit-button" data-id="{{ reserva.id }}" data-type="reserva">
+            <i class="bi bi-pencil-square"></i> Editar
+        </button>
+        <button type="button" class="delete-button" data-id="{{ reserva.id }}" data-type="reserva">
+            <i class="bi bi-trash"></i> Eliminar
+        </button>
+    </td>
+</tr>

@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Admin menu for managing products, clients, and sales.">
-    <meta name="keywords" content="admin, menu, products, clients, sales, management">
+    <meta name="description" content="Admin menu for managing reservations, clients, and locations.">
+    <meta name="keywords" content="admin, reservations, clients, locations, management">
     <title>Admin Menu</title>
     <link rel="stylesheet" href="{% static "style.css" %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -13,14 +13,13 @@
 </head>
 <body class="admin">
     <h1>Menú Admin</h1>
-    <!-- Menu mostrando los elementos actuales -->
     <h2>Opciones</h2>
     <div id="admin-options">
         <nav>
             <ul>
                 <li><button type="button" value="Productos">Reservas</button></li>
                 <li><button type="button" value="Clientes">Clientes</button></li>
-                <li><button type="button" value="Mesas">Mesas</button></li>
+                <li><button type="button" value="Lugares">Lugares</button></li>
             </ul>
         </nav>
         <div class="admin-content">
@@ -33,12 +32,12 @@
         <div id="reservas-content" class="admin-content">
             <div id="admin-content-header">
                 <h3>Reservas</h3>
-                <button type="button" id="add">
+                <button type="button" id="add" data-type="reserva">
                     <i class="bi bi-plus-circle"></i> Agregar
                 </button>
             </div>
             <div class="reservas" id="admin-content-titles">
-                <table id="reservas-table">
+                <table class="reservas-table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -47,12 +46,14 @@
                             <th>RUT</th>
                             <th>Teléfono</th>
                             <th>Correo Electrónico</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
                             <th>Cantidad de Personas</th>
                             <th>Lugar</th>
+                            <th class="tabla-elem-final"></th>
                         </tr>
                     </thead>
-                    <tbody id="reservas-body">
-                        <!-- Aquí se llenarán las reservas desde la base de datos -->
+                    <tbody class="reservas-body">
                         {% for reserva in reservas %}
                         <tr>
                             <td>{{ reserva.id }}</td>
@@ -61,8 +62,18 @@
                             <td>{{ reserva.RUT.RUT }}</td>
                             <td>{{ reserva.RUT.telefono }}</td>
                             <td>{{ reserva.RUT.email }}</td>
+                            <td>{{ reserva.fecha_reserva }}</td>
+                            <td>{{ reserva.hora_inicio }}</td>
                             <td>{{ reserva.cantidad_personas }}</td>
-                            <td>{{ reserva.espacio }}</td>
+                            <td>{{ reserva.espacio.nombre }}</td>
+                            <td class="tabla-elem-final">
+                                <button type="button" class="edit-button" data-id="{{ reserva.id }}" data-type="reserva">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </button>
+                                <button type="button" class="delete-button" data-id="{{ reserva.id }}" data-type="reserva">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -72,12 +83,12 @@
         <div id="clientes-content" class="admin-content">
             <div id="admin-content-header">
                 <h3>Clientes</h3>
-                <button type="button" id="add">
+                <button type="button" id="add" data-type="cliente">
                     <i class="bi bi-plus-circle"></i> Agregar
                 </button>
             </div>
             <div class="reservas" id="admin-content-titles">
-                <table id="reservas-table">
+                <table class="reservas-table">
                     <thead>
                         <tr>
                             <th>RUT</th>
@@ -86,10 +97,10 @@
                             <th>Teléfono</th>
                             <th>Correo Electrónico</th>
                             <th>Visitas</th>
+                            <th class="tabla-elem-final"></th>
                         </tr>
                     </thead>
-                    <tbody id="reservas-body">
-                        <!-- Aquí se llenarán las reservas desde la base de datos -->
+                    <tbody class="reservas-body">
                         {% for cliente in clientes %}
                         <tr>
                             <td>{{ cliente.RUT }}</td>
@@ -98,6 +109,53 @@
                             <td>{{ cliente.telefono }}</td>
                             <td>{{ cliente.email }}</td>
                             <td>{{ cliente.visitas }}</td>
+                            <td class="tabla-elem-final">
+                                <button type="button" class="edit-button" data-id="{{ cliente.RUT }}" data-type="cliente">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </button>
+                                <button type="button" class="delete-button" data-id="{{ cliente.RUT }}" data-type="cliente">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="lugares-content" class="admin-content">
+            <div id="admin-content-header">
+                <h3>Lugar</h3>
+                <button type="button" id="add" data-type="lugar">
+                    <i class="bi bi-plus-circle"></i> Agregar
+                </button>
+            </div>
+            <div class="reservas" id="admin-content-titles">
+                <table class="reservas-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Capacidad Maxima</th>
+                            <th>Descripción</th>
+                            <th class="tabla-elem-final"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="reservas-body">
+                        {% for lugar in lugares %}
+                        <tr>
+                            <td>{{ lugar.id }}</td>
+                            <td>{{ lugar.nombre }}</td>
+                            <td>{{ lugar.capacidadMaxima }}</td>
+                            <td>{{ lugar.descripcion }}</td>
+                            <td class="tabla-elem-final">
+                                <button type="button" class="edit-button" data-id="{{ lugar.id }}" data-type="lugar">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </button>
+                                <button type="button" class="delete-button" data-id="{{ lugar.id }}" data-type="lugar">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -106,5 +164,35 @@
         </div>
     </div>
     <input id="admin-salida" type="submit" value="Salir" onclick="inicio()">
+
+    <!-- Modal para editar -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()"><i class="bi bi-x"></i></span>
+            <h3 id="modal-title">Editar</h3>
+            <form id="edit-form">
+                {% csrf_token %}
+                <div id="modal-fields">
+                    <!-- Aqui se añaden los campos -->
+                </div>
+                <button type="submit">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para añadir -->
+    <div id="add-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeAddModal()"><i class="bi bi-x"></i></span>
+            <h3 id="add-modal-title">Agregar Nuevo</h3>
+            <form id="add-form">
+                {% csrf_token %}
+                <div id="add-modal-fields">
+                    <!-- Aqui se añaden los campos -->
+                </div>
+                <button type="submit">Agregar</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

@@ -1,0 +1,14 @@
+<tr>
+    <td>{{ lugar.id }}</td>
+    <td>{{ lugar.nombre }}</td>
+    <td>{{ lugar.capacidadMaxima }}</td>
+    <td>{{ lugar.descripcion }}</td>
+    <td class="tabla-elem-final">
+        <button type="button" class="edit-button" data-id="{{ lugar.id }}" data-type="lugar">
+            <i class="bi bi-pencil-square"></i> Editar
+        </button>
+        <button type="button" class="delete-button" data-id="{{ lugar.id }}" data-type="lugar">
+            <i class="bi bi-trash"></i> Eliminar
+        </button>
+    </td>
+</tr>
