@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
-
+// Añadir un nuevo elemento a la tabla
 document.addEventListener("DOMContentLoaded", () => {
     const addButtons = document.querySelectorAll("#add");
     const addModal = document.getElementById("add-modal");
@@ -245,16 +245,8 @@ document.addEventListener("DOMContentLoaded", () => {
             addModalFields.innerHTML = "";
             if (type === "reserva") {
                 addModalFields.innerHTML = `
-                    <label for="add-nombre">Nombre:</label>
-                    <input type="text" id="add-nombre" name="nombre" required>
-                    <label for="add-apellido">Apellido:</label>
-                    <input type="text" id="add-apellido" name="apellido" required>
                     <label for="add-rut">RUT:</label>
                     <input type="text" id="add-rut" name="RUT" required>
-                    <label for="add-telefono">Teléfono:</label>
-                    <input type="text" id="add-telefono" name="telefono" required>
-                    <label for="add-email">Correo Electrónico:</label>
-                    <input type="email" id="add-email" name="email" required>
                     <label for="add-fecha">Fecha:</label>
                     <input type="date" id="add-fecha" name="fecha_reserva" required>
                     <label for="add-hora">Hora:</label>
