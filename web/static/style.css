@@ -174,7 +174,7 @@ body.admin.authenticated {
     padding: 0 10px;
 }
 
-.admin-content#reservas-content, .admin-content#clientes-content, .admin-content#lugares-content {
+.admin-content#reserva-content, .admin-content#cliente-content, .admin-content#lugar-content {
     display: none;
 }
 
@@ -196,6 +196,11 @@ body.admin.authenticated {
     background-color: #63e163;
     color: green;
     border-radius: 20px;
+}
+
+#admin-content-header #add:hover {
+    background-color: #4dff4d;
+    color: #1a8cff;
 }
 
 #admin-content-header #add i {
@@ -334,6 +339,18 @@ td.tabla-elem-final button.edit-button:hover {
     margin: 4px 2px;
     border-radius: 5px;
 }
+
+/* Añadir */
+
+select#add-lugar{
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+
 /* Pagina frontal */
 
 html, body {

@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.db.models import Sum
-from django.utils.timezone import now, timedelta
+from django.utils.timezone import now, timedelta, make_aware, make_naive
 
 # Create your views here.
 def index(request):
@@ -16,15 +16,16 @@ def admin(request):
     clientes = Cliente.objects.all()
     lugares = Espacios.objects.all()
     
-    capacidad_actual = {}
+    today = date.today().isoformat() # AAAA-MM-DD
+    tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
+    
+    # Crear una lista de lugares con capacidad dinámica
+    lugares_con_capacidad = []
+    tiempo_actual = now()
+    rango_inicio = tiempo_actual - timedelta(minutes=30)
+    rango_fin = tiempo_actual + timedelta(minutes=30)
 
-    # Calcular capacidad actual para cada lugar
     for lugar in lugares:
-        # Rango de tiempo de 30 minutos antes y después de la hora actual
-        tiempo_actual = now()
-        rango_inicio = tiempo_actual - timedelta(minutes=30)
-        rango_fin = tiempo_actual + timedelta(minutes=30)
-
         # Sumar la cantidad de personas en reservas dentro del rango de tiempo
         reservas_en_rango = reservas.filter(
             espacio=lugar,
@@ -33,13 +34,24 @@ def admin(request):
         ).aggregate(total_personas=Sum('cantidad_personas'))['total_personas'] or 0
 
         # Calcular capacidad actual
-        capacidad_actual[lugar.id] = lugar.capacidadMaxima - reservas_en_rango
+        capacidad_actual = lugar.capacidadMaxima - reservas_en_rango
 
-    return render(request, 'admin.html', 
-                  {'reservas': reservas,
-                   'clientes': clientes, 
-                   'lugares': lugares, 
-                   'capacidad_actual':capacidad_actual})
+        # Añadir el lugar con su capacidad actual a la lista
+        lugares_con_capacidad.append({
+            'id': lugar.id,
+            'nombre': lugar.nombre,
+            'capacidadMaxima': lugar.capacidadMaxima,
+            'descripcion': lugar.descripcion,
+            'capacidad_actual': capacidad_actual,
+            'today': today,
+            'tiemponow': tiemponow,
+        })
+
+    return render(request, 'admin.html', {
+        'reservas': reservas,
+        'clientes': clientes,
+        'lugares': lugares_con_capacidad,  # Usar la lista con capacidad dinámica
+    })
 
 def front(request):
     return render(request, 'front.html')
@@ -77,6 +89,7 @@ def edit_cliente(request):
     return JsonResponse({"success": False})
 
 def get_reserva(request, id):
+    now = datetime.now().strftime("%Y-%m-%dT%H:%M") 
     reserva = Reserva.objects.get(id=id)
     data = {
         "id": reserva.id,
@@ -89,20 +102,27 @@ def get_reserva(request, id):
         "hora_inicio": reserva.hora_inicio,
         "cantidad_personas": reserva.cantidad_personas,
         "espacio": reserva.espacio.nombre,
+        "now": now,
     }
     return JsonResponse(data)
 
 @csrf_exempt
 def edit_reserva(request):
     if request.method == "POST":
+        
+        fecha_reserva = request.POST["fecha_reserva"]
+        naive_datetime = datetime.fromisoformat(fecha_reserva)
+        aware_datetime = make_aware(naive_datetime)
+        lugar = Espacios.objects.get(id=request.POST["espacio"])
+        
         id = request.POST.get("id")
         reserva = Reserva.objects.get(id=id)
-        reserva.fecha_reserva = request.POST.get("fecha_reserva")
-        reserva.hora_inicio = request.POST.get("hora_inicio")
+        reserva.fecha_reserva = aware_datetime
+        reserva.hora_inicio = aware_datetime.time()
         reserva.cantidad_personas = request.POST.get("cantidad_personas")
-        reserva.espacio = request.POST.get("espacio")
+        reserva.espacio = lugar
         reserva.save()
-        return JsonResponse({"success": True, "id": reserva.id})
+        return JsonResponse({"success": True, "id": reserva.id, "RUT": reserva.RUT.RUT, "nombre": reserva.RUT.nombre, "apellido": reserva.RUT.apellido, "telefono": reserva.RUT.telefono, "email": reserva.RUT.email, "fecha_reserva": naive_datetime, "hora_inicio": reserva.hora_inicio, "cantidad_personas": reserva.cantidad_personas, "espacio": reserva.espacio.nombre})
     return JsonResponse({"success": False})
 
 def get_lugar(request, id):
@@ -124,7 +144,7 @@ def edit_lugar(request):
         lugar.capacidadMaxima = request.POST.get("capacidadMaxima")
         lugar.descripcion = request.POST.get("descripcion")
         lugar.save()
-        return JsonResponse({"success": True, "id": lugar.id})
+        return JsonResponse({"success": True, "id": lugar.id, "nombre": lugar.nombre, "capacidadMaxima": lugar.capacidadMaxima, "descripcion": lugar.descripcion})
     return JsonResponse({"success": False})
 
 @csrf_exempt
@@ -164,11 +184,16 @@ def add_reserva(request):
     if request.method == "POST":
         # Create a new Reserva object
         cliente = Cliente.objects.get(RUT=request.POST["RUT"])
-        lugar = Espacios.objects.get(nombre=request.POST["espacio"])
+        lugar = Espacios.objects.get(id=request.POST["espacio"])
+        
+        fecha_reserva = request.POST["fecha_reserva"]
+        naive_datetime = datetime.fromisoformat(fecha_reserva)
+        aware_datetime = make_aware(naive_datetime)
+        
         reserva = Reserva.objects.create(
             RUT=cliente,
-            fecha_reserva=request.POST["fecha_reserva"],
-            hora_inicio=request.POST["hora_inicio"],
+            fecha_reserva=aware_datetime,
+            hora_inicio=aware_datetime.time(),
             cantidad_personas=request.POST["cantidad_personas"],
             espacio=lugar,
         )
@@ -202,3 +227,7 @@ def add_lugar(request):
         new_row_html = render_to_string("partials/lugar_row.html", {"lugar": lugar})
         return JsonResponse({"success": True, "new_row_html": new_row_html})
     return JsonResponse({"success": False})
+
+def get_all_lugares(request):
+    lugares = Espacios.objects.all().values('id', 'nombre', 'capacidadMaxima', 'descripcion')
+    return JsonResponse(list(lugares), safe=False)

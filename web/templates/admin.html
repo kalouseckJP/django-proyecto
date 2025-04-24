@@ -30,7 +30,7 @@
             </div>
             <p>En esta sección puedes gestionar los productos, clientes y ventas.</p>
         </div>
-        <div id="reservas-content" class="admin-content">
+        <div id="reserva-content" class="admin-content">
             <div id="admin-content-header">
                 <h3>Reservas</h3>
                 <button type="button" id="add" data-type="reserva">
@@ -81,7 +81,7 @@
                 </table>
             </div>
         </div>
-        <div id="clientes-content" class="admin-content">
+        <div id="cliente-content" class="admin-content">
             <div id="admin-content-header">
                 <h3>Clientes</h3>
                 <button type="button" id="add" data-type="cliente">
@@ -124,7 +124,7 @@
                 </table>
             </div>
         </div>
-        <div id="lugares-content" class="admin-content">
+        <div id="lugar-content" class="admin-content">
             <div id="admin-content-header">
                 <h3>Lugar</h3>
                 <button type="button" id="add" data-type="lugar">
@@ -149,7 +149,7 @@
                             <td>{{ lugar.id }}</td>
                             <td>{{ lugar.nombre }}</td>
                             <td>{{ lugar.capacidadMaxima }}</td>
-                            <td>{{ capacidad_actual }}</td>
+                            <td>{{ lugar.capacidad_actual }}</td>
                             <td>{{ lugar.descripcion }}</td>
                             <td class="tabla-elem-final">
                                 <button type="button" class="edit-button" data-id="{{ lugar.id }}" data-type="lugar">
