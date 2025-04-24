@@ -327,6 +327,10 @@ td.tabla-elem-final button.edit-button:hover {
     border: 1px solid #ccc;
 }
 
+.modal input:hover{
+    background-color: #f0f0f0;
+}
+
 #edit-form button[type="submit"], #add-form button[type="submit"] {
     background-color: #2C2C2C;
     color: white;
@@ -338,6 +342,18 @@ td.tabla-elem-final button.edit-button:hover {
     font-size: 16px;
     margin: 4px 2px;
     border-radius: 5px;
+}
+
+select {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+select:hover {
+    background-color: #f0f0f0;
 }
 
 /* Añadir */
