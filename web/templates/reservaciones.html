@@ -59,7 +59,7 @@
             <select id="lugar" name="lugar" required>
                 <option value="" disabled selected>Seleccione un lugar</option>
                 {% for lugar in lugares %}
-                    <option value="{{ lugar.id }}">{{ lugar.nombre }} - {{ lugar.capacidadActual }}</option>
+                    <option value="{{ lugar.id }}">{{ lugar.nombre }}</option>
                 {% endfor %}
             </select><br>
 

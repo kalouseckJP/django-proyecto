@@ -22,20 +22,18 @@ def admin(request):
     # Crear una lista de lugares con capacidad dinámica
     lugares_con_capacidad = []
     tiempo_actual = now()
-    rango_inicio = tiempo_actual - timedelta(minutes=30)
+    rango_inicio = tiempo_actual - timedelta(minutes=60)
     rango_fin = tiempo_actual + timedelta(minutes=30)
+    print(tiempo_actual, ' ' ,type(rango_inicio), ' ' ,type(rango_fin))
 
     for lugar in lugares:
         # Sumar la cantidad de personas en reservas dentro del rango de tiempo
         reservas_en_rango = reservas.filter(
             espacio=lugar,
-            hora_inicio__gte=rango_inicio,
-            hora_inicio__lte=rango_fin
         ).aggregate(total_personas=Sum('cantidad_personas'))['total_personas'] or 0
-
         # Calcular capacidad actual
         capacidad_actual = lugar.capacidadMaxima - reservas_en_rango
-
+        
         # Añadir el lugar con su capacidad actual a la lista
         lugares_con_capacidad.append({
             'id': lugar.id,
@@ -43,14 +41,14 @@ def admin(request):
             'capacidadMaxima': lugar.capacidadMaxima,
             'descripcion': lugar.descripcion,
             'capacidad_actual': capacidad_actual,
-            'today': today,
-            'tiemponow': tiemponow,
         })
 
     return render(request, 'admin.html', {
         'reservas': reservas,
         'clientes': clientes,
         'lugares': lugares_con_capacidad,  # Usar la lista con capacidad dinámica
+        'tiempo': tiemponow,
+        'today': today,
     })
 
 def front(request):
@@ -60,7 +58,16 @@ def hacer_reserva(request):
     today = date.today().isoformat() # AAAA-MM-DD
     now = datetime.now().strftime('%H:%M') # HH:MM
     lugares = Espacios.objects.all()
-    return render(request, 'reservaciones.html', {'today': today, 'now': now, 'lugares': lugares})
+    reservas = Reserva.objects.all()
+    for lugar in lugares:
+        # Sumar la cantidad de personas en reservas dentro del rango de tiempo
+        reservas_en_rango = reservas.filter(
+            espacio=lugar,
+        ).aggregate(total_personas=Sum('cantidad_personas'))['total_personas'] or 0
+        # Calcular capacidad actual
+        capacidad_actual = lugar.capacidadMaxima - reservas_en_rango
+        
+    return render(request, 'reservaciones.html', {'today': today, 'now': now, 'lugares': lugares, 'capacidad_actual': capacidad_actual})
 
 def get_cliente(request, RUT):
     cliente = Cliente.objects.get(RUT=RUT)

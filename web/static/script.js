@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
             window.location.href = "/";
         }
 else {
-            document.body.classList.add("authenticated"); // Show content if authenticated
+            document.body.classList.add("authenticated");
         }
     }
 });
@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     adminContent.style.display = "none";
                     document.getElementById("lugar-content").style.display = "none";
                     document.getElementById("cliente-content").style.display = "none";
+                    document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("reserva-content").style.display = "block";
                     // content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
                     break;
@@ -61,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     adminContent.style.display = "none";
                     document.getElementById("reserva-content").style.display = "none";
                     document.getElementById("lugar-content").style.display = "none";
+                    document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("cliente-content").style.display = "block";
                     // content = "<div id='admin-content-header'><h3>Gestion de Clientes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los clientes.</p>";
                     break;
@@ -68,8 +70,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     adminContent.style.display = "none";
                     document.getElementById("reserva-content").style.display = "none";
                     document.getElementById("cliente-content").style.display = "none";
+                    document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("lugar-content").style.display = "block";
                     // content = "<div id='admin-content-header'><h3>Gestion de Ventas</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los ventas.</p>";
+                    break;
+                case "Reportes":
+                    adminContent.style.display = "none";
+                    document.getElementById("reserva-content").style.display = "none";
+                    document.getElementById("cliente-content").style.display = "none";
+                    document.getElementById("lugar-content").style.display = "none";
+                    document.getElementById("reporte-content").style.display = "block";
+                    // content = "<div id='admin-content-header'><h3>Gestion de Reportes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los reportes.</p>";
                     break;
                 default:    
                     content = "<h3>Contenido de Administración</h3><p>Aquí van gestionar los productos, clientes y ventas.</p>";
@@ -107,17 +118,16 @@ document.addEventListener("DOMContentLoaded", () => {
                             <input type="datetime-local" id="add-fecha" name="fecha_reserva" value="${data.now}" min="${data.now}" required>
                             <label for="edit-cantidad">Cantidad de Personas:</label>
                             <input type="number" id="edit-cantidad" name="cantidad_personas" value="${data.cantidad_personas}" min="1" required>
+                            <label for="edit-lugar">Lugar:</label>
                             <select id="edit-lugar" name="espacio" required>
                                 <option value="">Seleccione un lugar</option>
                             </select>
                         `;
 
-                        // Fetch lugares from the server and populate the select element
                         const lugarSelect = document.getElementById("edit-lugar");
-                        fetch(`/get_lugares/`) // Replace with your actual API endpoint
+                        fetch(`/get_lugares/`) 
                             .then(response => response.json())
                             .then(data => {
-                                // Populate the select element with options
                                 data.forEach(lugar => {
                                     const option = document.createElement("option");
                                     option.value = lugar.id;
@@ -175,13 +185,10 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update the table row dynamically
                     let row;
                     if (type === "cliente") {
-                        // Use RUT to find the row for cliente
                         row = document.querySelector(`button[data-id="${data.RUT}"]`).closest("tr");
                     } else {
-                        // Use id for other types
                         row = document.querySelector(`button[data-id="${data.id}"]`).closest("tr");
                     }
 
@@ -219,6 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+// Eliminar un elemento de la tabla
 document.addEventListener("DOMContentLoaded", () => {
     const deleteButtons = document.querySelectorAll(".delete-button");
 
@@ -227,10 +235,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const id = button.getAttribute("data-id");
             const type = button.getAttribute("data-type");
 
-            // Show confirmation dialog
             const confirmDelete = confirm(`¿Estás seguro de que deseas eliminar este ${type}?`);
             if (confirmDelete) {
-                // Send delete request to the server
                 fetch(`/delete_${type}/${id}/`, {
                     method: "DELETE",
                     headers: {
@@ -256,6 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
 // Añadir un nuevo elemento a la tabla
 document.addEventListener("DOMContentLoaded", () => {
     const addButtons = document.querySelectorAll("#add");
@@ -309,11 +316,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     <label for="add-apellido">Apellido:</label>
                     <input type="text" id="add-apellido" name="apellido" required>
                     <label for="add-telefono">Teléfono:</label>
-                    <input type="text" id="add-telefono" name="telefono" required>
+                    <input type="text" id="add-telefono" name="telefono" value="+569" required>
                     <label for="add-email">Correo Electrónico:</label>
                     <input type="email" id="add-email" name="email" required>
                     <label for="add-visitas">Visitas:</label>
-                    <input type="number" id="add-visitas" name="visitas" required>
+                    <input type="number" id="add-visitas" name="visitas" value="1" min="1" required>
                 `;
             } else if (type === "lugar") {
                 addModalFields.innerHTML = `
@@ -390,4 +397,93 @@ document.addEventListener("DOMContentLoaded", () => {
     window.closeAddModal = function () {
         addModal.style.display = "none";
     };
+});
+
+// Cerrar el modal al presionar la tecla "Esc"
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+        const editModal = document.getElementById("edit-modal");
+        const addModal = document.getElementById("add-modal");
+        if (editModal.style.display === "flex") {
+            closeModal();
+        } else if (addModal.style.display === "flex") {
+            closeAddModal();
+        }
+    }
+});
+
+document.addEventListener("input", (event) => {
+    // Restringir el campo de Telefono a un formato específico. "+56912345678", iniciando con +569 forzado
+    if (event.target.name === "telefono") {
+        const input = event.target;
+        let value = input.value.replace(/[^0-9]/g, ""); // Eliminar caracteres no válidos, excepto números
+
+        // Asegurar que el prefijo "+569" siempre esté presente
+        if (!value.startsWith("569")) {
+            value = "569" + value;
+        }
+
+        // Limitar a un máximo de 12 caracteres (incluyendo el prefijo "+569")
+        if (value.length > 11) {
+            value = value.slice(0, 11);
+        }
+
+        // Agregar el "+" al inicio
+        input.value = "+" + value;
+    }
+
+    // Restringir el campo de RUT a un formato específico. "12345678-9"
+    if (event.target.name === "RUT") {
+        const input = event.target;
+        let value = input.value.replace(/[^0-9kK]/g, ""); // Eliminar caracteres no válidos
+    
+        if (value.length > 0) {
+            if (value.length > 9) {
+                // Limitar a un máximo de 9 caracteres antes del guion y 1 después
+                value = value.slice(0, 8) + "-" + value.slice(8, 9);
+            } else if (value.length > 8) {
+                // Agregar el guion automáticamente si tiene más de 8 caracteres
+                value = value.slice(0, 8) + "-" + value.slice(8);
+            }
+        }
+    
+        input.value = value;
+    }
+
+    // Restringir el campo de visitas a un número positivo
+    if (event.target.name === "visitas") {
+        const input = event.target;
+        let value = input.value.replace(/[^0-9]/g, ""); // Eliminar caracteres no válidos, excepto números
+
+        // Limitar a un máximo de 2 dígitos
+        if (value.length > 2) {
+            value = value.slice(0, 2);
+        }
+
+        input.value = value;
+    }
+    // Restringir el campo de capacidad máxima a un número positivo
+    if (event.target.name === "capacidadMaxima") {
+        const input = event.target;
+        let value = input.value.replace(/[^0-9]/g, ""); // Eliminar caracteres no válidos, excepto números
+
+        // Limitar a un máximo de 3 dígitos
+        if (value.length > 3) {
+            value = value.slice(0, 3);
+        }
+
+        input.value = value;
+    }
+    // Restringir el campo de cantidad de personas a un número positivo
+    if (event.target.name === "cantidad_personas") {
+        const input = event.target;
+        let value = input.value.replace(/[^0-9]/g, ""); // Eliminar caracteres no válidos, excepto números
+
+        // Limitar a un máximo de 2 dígitos
+        if (value.length > 2) {
+            value = value.slice(0, 2);
+        }
+
+        input.value = value;
+    }
 });

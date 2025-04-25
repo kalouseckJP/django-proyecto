@@ -174,7 +174,7 @@ body.admin.authenticated {
     padding: 0 10px;
 }
 
-.admin-content#reserva-content, .admin-content#cliente-content, .admin-content#lugar-content {
+.admin-content#reserva-content, .admin-content#cliente-content, .admin-content#lugar-content, .admin-content#reporte-content {
     display: none;
 }
 
@@ -246,7 +246,7 @@ table.reservas-table td {
 }
 td.tabla-elem-final {
     width: min-content;
-    padding: 8px 0;
+    padding: 8px 5px;
 }
 
 th.tabla-elem-final {
@@ -259,13 +259,17 @@ td.tabla-elem-final button {
     border-radius: 20px;
 }
 
+button.edit-button{
+    margin-bottom: 5px;
+}
+
 td.tabla-elem-final button.delete-button {
     background-color: #ff4d4d;
     color: white;
 }
 
 td.tabla-elem-final button.delete-button:hover {
-    background-color: #ff1a1a;
+    background-color: #d92020;
 }
 
 td.tabla-elem-final button.edit-button {
@@ -274,7 +278,7 @@ td.tabla-elem-final button.edit-button {
 }
 
 td.tabla-elem-final button.edit-button:hover {
-    background-color: #1a8cff;
+    background-color: #1777d6;
 }
 
 /* Edit */
@@ -328,6 +332,17 @@ td.tabla-elem-final button.edit-button:hover {
 }
 
 .modal input:hover{
+    background-color: #f0f0f0;
+}
+
+.modal textarea {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.modal textarea:hover{
     background-color: #f0f0f0;
 }
 
@@ -535,6 +550,8 @@ footer {
 
 img#mapa{
     margin: 0 5px;
+    width: 90%;
+    max-width: 800px;
 }
 
 @media screen and (max-width: 900px) {

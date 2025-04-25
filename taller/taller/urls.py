@@ -22,6 +22,7 @@ urlpatterns = [
     path('DJANGOADMIN/', admin.site.urls),
     path('', views.index, name='index'),
     path('admin', views.admin, name='admin'),
+    path('admin/', views.admin, name='admin'),
     path('front', views.front, name='front'),
     path('reservaciones', views.hacer_reserva, name='reservaciones'),
     path('get_cliente/<str:RUT>/', views.get_cliente, name='get_cliente'),
