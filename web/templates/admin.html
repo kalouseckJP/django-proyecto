@@ -7,10 +7,12 @@
     <meta name="description" content="Admin menu for managing reservations, clients, and locations.">
     <meta name="keywords" content="admin, reservations, clients, locations, management">
     <title>Admin Menu</title>
-    <link rel="stylesheet" href="{% static "style.css" %}">
+    <link rel="stylesheet" href="{% static "styles\admin-page.css" %}">
+    <link rel="stylesheet" href="{% static "styles\admin-page.css" %}">
+    <link rel="stylesheet" href="{% static "styles\general.css" %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="shortcut icon" href="{% static "img\large.png" %}" type="image/x-icon">
-    <script src="{% static "script.js" %}"></script>
+    <script src="{% static "js\script.js" %}"></script>
 </head>
 <body class="admin">
     <h1>Menú Admin</h1>
@@ -31,7 +33,7 @@
             </div>
             <p>En esta sección puedes gestionar los productos, clientes y ventas.</p>
         </div>
-        <div id="reserva-content" class="admin-content">
+        <div id="reserva-content" class="admin-content tablas">
             <div id="admin-content-header">
                 <h3>Reservas</h3>
                 <button type="button" id="add" data-type="reserva">
@@ -82,7 +84,7 @@
                 </table>
             </div>
         </div>
-        <div id="cliente-content" class="admin-content">
+        <div id="cliente-content" class="admin-content tablas">
             <div id="admin-content-header">
                 <h3>Clientes</h3>
                 <button type="button" id="add" data-type="cliente">
@@ -125,7 +127,7 @@
                 </table>
             </div>
         </div>
-        <div id="lugar-content" class="admin-content">
+        <div id="lugar-content" class="admin-content tablas">
             <div id="admin-content-header">
                 <h3>Lugar</h3>
                 <button type="button" id="add" data-type="lugar">
@@ -166,7 +168,7 @@
                 </table>
             </div>
         </div>
-        <div id="reporte-content" class="admin-content">
+        <div id="reporte-content" class="admin-content tablas">
             <div id="admin-content-header">
                 <h3>Reportes</h3>
             </div>

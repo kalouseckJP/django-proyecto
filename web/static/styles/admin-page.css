@@ -1,0 +1,315 @@
+body {
+    display: none; /* Esconde la pagina si es que no se autentifica */
+}
+
+body.authenticated {
+    display: block; /* Muestra la pagina cuando se autentifica */
+}
+
+.menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f9fa;
+    list-style-type: none;
+    border-radius: 15px;
+}
+
+/* Recuadro general */
+.admin #admin-options {
+    display: flex;
+    background-color: #f8f9fa;
+    border-radius: 20px;
+    border: #1E1E1E solid 1px;
+    padding: 0;
+}
+
+/* Barra lateral izquierda menu */ 
+.admin #admin-options nav{
+    margin: 0;
+    width: 20%;
+    border-right: #1E1E1E solid 1px;
+    background-color: #dedede;
+    border-radius: 20px 0 0 20px;
+    padding: 10px 0
+}
+
+/* Estilo de lista barra lateral izquierda menu */
+.admin #admin-options ul{
+    display: flex;
+    list-style-type: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0;
+    gap: 5px;
+    margin: 0;
+}
+
+.admin #admin-options li {
+    width: 100%;
+}
+
+/* Estilo botones menú */
+#admin-options button {
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* Estilo botones barra lateral */
+#admin-options nav button {
+    width: 100%;
+    border-radius: 20px;
+    background-color: transparent;
+}
+
+.admin #admin-options nav button:hover {
+    background-color: #c4c4c4;
+}
+
+/* Estilo boton de salida */
+.admin input[type="submit"]#admin-salida {
+    background-color: #2C2C2C;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 15px 0px;
+    border-radius: 5px;
+}
+
+.admin input[type="submit"]#admin-salida:hover {
+    background-color: #1E1E1E;
+    color: #D9D9D9;
+}
+
+/* Orden columna derecha */
+.admin-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+}
+
+.admin-content * {
+    padding: 0 10px;
+}
+
+/* Logica para las tablas */
+.admin-content.tablas {
+    display: none;
+}
+
+/* Separador titulo tabla*/ 
+#admin-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    border-bottom: black solid 1px;
+}
+
+/* Estilo titulo */
+#admin-content-header h3 {
+    padding: 0;
+}
+
+/* Estilo boton añadir */
+#admin-content-header #add {
+    width: max-content;
+    text-align: center;
+    background-color: #63e163;
+    color: green;
+    border-radius: 20px;
+}
+
+#admin-content-header #add:hover {
+    background-color: #4dff4d;
+    color: #1a8cff;
+}
+
+#admin-content-header #add i {
+    padding: 0;
+}
+
+#admin-content-titles {
+    overflow-x: auto;
+}
+
+/* Tabla admin */
+
+table.reservas-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table.reservas-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    background-color: #f2f2f2;
+    color: black;
+}
+
+table.reservas-table tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+table.reservas-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+table.reservas-table tr:hover {
+    background-color: #ddd;
+}
+
+table.reservas-table td {
+    text-align: center;
+    border: 1px solid #ddd;
+}
+td.tabla-elem-final {
+    width: min-content;
+    padding: 8px 5px;
+}
+
+th.tabla-elem-final {
+    width: min-content;
+    padding: 12px 0;
+}
+
+td.tabla-elem-final button {
+    width: min-content;
+    border-radius: 20px;
+}
+
+button.edit-button{
+    margin-bottom: 5px;
+}
+
+td.tabla-elem-final button.delete-button {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+td.tabla-elem-final button.delete-button:hover {
+    background-color: #d92020;
+}
+
+td.tabla-elem-final button.edit-button {
+    background-color: #4d94ff;
+    color: white;
+}
+
+td.tabla-elem-final button.edit-button:hover {
+    background-color: #1777d6;
+}
+
+/* Modal */
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    padding: auto;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    backdrop-filter: brightness(0.5);
+}
+
+/* Modal Edit */
+
+.modal-content {
+    background-color: #fefefe;
+    margin:auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: min-content;
+    border-radius: 20px;
+    border: #1E1E1E solid 1px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    background-color: #f9f9f9;
+    padding: 20px 50px;
+    border-radius: 20px;
+    border: #1E1E1E solid 1px;
+}
+
+form input {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.modal input:hover{
+    background-color: #f0f0f0;
+}
+
+.modal textarea {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.modal textarea:hover{
+    background-color: #f0f0f0;
+}
+
+form button[type="submit"] {
+    background-color: #2C2C2C;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 5px;
+}
+
+select {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+select:hover {
+    background-color: #f0f0f0;
+}
+
+/* Modal Añadir */
+
+select#add-lugar{
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+@media screen and (max-width: 900px) {
+    .admin #admin-options nav {
+        width: max-content;
+    }
+}
