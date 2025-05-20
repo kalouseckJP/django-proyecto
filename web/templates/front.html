@@ -1,32 +1,35 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Welcome to the reservation system. Manage your bookings efficiently.">
-    <meta name="keywords" content="reservations, booking, admin, system">
-    <title>Frente</title>
-    <link rel="stylesheet" href="{% static "styles\front-page.css" %}">
-    <link rel="stylesheet" href="{% static "styles\general.css" %}">
-    <link rel="shortcut icon" href="{% static "img\large.png" %}" type="image/x-icon">
-    <script src="{% static "js\script.js" %}"></script>
-</head>
-<body class="frente">
-    <header id="banner">
-        <h1>Menú Principal</h1>
-        <div id="divLogin">
-            <button type="button" onclick="window.location.href='{% url "index" %}'">Admin</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Welcome to the reservation system. Manage your bookings efficiently.">
+        <meta name="keywords" content="reservations, booking, admin, system">
+        <title>Frente</title>
+        <link rel="stylesheet" href="{% static "styles\front-page.css" %}">
+        <link rel="stylesheet" href="{% static "styles\general.css" %}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+        <link rel="shortcut icon" href="{% static "img\large.png" %}" type="image/x-icon">
+        <script src="{% static "js\expirar-script.js" %}"></script>
+    </head>
+    <body class="frente">
+        <header id="banner">
+            <h1>Menú Principal</h1>
+            <div id="divLogin">
+                <button type="button" onclick="window.location.href='{% url "index" %}'">Admin</button>
+            </div>
+        </header>
+        <div id="columna_principal">
+            <h2>Bienvenido a las reservas</h2>
+            <img src="{% static "img\large.png" %}" height="600" width="800" alt="mapa" id="mapa">
+            <p>En esta página puedes gestionar tus reservas de manera eficiente.</p>
+            <button type="button" onclick="window.location.href='{% url "reservaciones" %}'">Hacer Reserva</button>
         </div>
-    </header>
-    <div id="columna_principal">
-        <h2>Bienvenido a las reservas</h2>
-        <img src="{% static "img\large.png" %}" height="600" width="800" alt="mapa" id="mapa">
-        <p>En esta página puedes gestionar tus reservas de manera eficiente.</p>
-        <button type="button" onclick="window.location.href='{% url "reservaciones" %}'">Hacer Reserva</button>
-    </div>
-    <footer>
-        <p> © 2025 Reservas. Todos los derechos reservados.</p>
-    </footer>
-</body>
+        <footer>
+            <p>© 2025 Reservas. Todos los derechos reservados.</p>
+        </footer>
+    </body>
 </html>

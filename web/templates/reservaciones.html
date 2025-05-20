@@ -1,82 +1,94 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Página para realizar reservaciones en línea de manera rápida y sencilla.">
-    <meta name="keywords" content="reservaciones, online, lugares, eventos, reservas">
-    <title>Hacer Reservaciones</title>
-    <link rel="stylesheet" href="{% static "styles\cliente-reserva-page.css" %}">
-    <link rel="stylesheet" href="{% static "styles\general.css" %}">
-    <link rel="stylesheet" href="{% static "styles\front-page.css" %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="shortcut icon" href="{% static "img\large.png" %}" type="image/x-icon">
-    <script src="{% static "js\script.js" %}"></script>
-</head>
-<body class="hacer-reservacion">
-    <header id="banner">
-        <button type="button" id="menu" onclick="window.location.href='{% url 'front' %}';"><h1>Menú Principal</h1></button>
-        <div id="divLogin">
-            <button type="button" onclick="window.location.href='{% url "index" %}';">Admin</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Página para realizar reservaciones en línea de manera rápida y sencilla.">
+        <meta name="keywords" content="reservaciones, online, lugares, eventos, reservas">
+        <title>Hacer Reservaciones</title>
+        <link rel="stylesheet" href="{% static "styles\cliente-reserva-page.css" %}">
+        <link rel="stylesheet" href="{% static "styles\general.css" %}">
+        <link rel="stylesheet" href="{% static "styles\front-page.css" %}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+        <link rel="shortcut icon" href="{% static "img\large.png" %}" type="image/x-icon">
+        <script src="{% static "js\expirar-script.js" %}"></script>
+        <script src="{% static "js\validaciones-script.js" %}"></script>
+    </head>
+    <body class="hacer-reservacion">
+        <header id="banner">
+            <button type="button" id="menu" onclick="window.location.href='{% url 'front' %}';">
+                <h1>Menú Principal</h1>
+            </button>
+            <div id="divLogin">
+                <button type="button" onclick="window.location.href='{% url "index" %}';">Admin</button>
+            </div>
+        </header>
+        <div id="columna_principal">
+            <h2>Hacer Reservaciones</h2>
+            <img src="{% static "img\large.png" %}" height="600" width="800" alt="mapa" id="mapa">
+
+            <form action="" method="post" name="reservacionForm" id="reservacionForm">
+                {% csrf_token %}
+                <label for="nombre">Nombre *</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
+                <br>
+
+                <label for="apellido">Apellido *</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Apellido" required>
+                <br>
+
+                <label for="RUT">RUT *</label>
+                <input type="text" id="RUT" name="RUT" placeholder="RUT" required>
+                <br>
+
+                <label for="telefono">Teléfono *</label>
+                <input type="text" id="telefono" name="telefono" value="+569" required>
+                <br>
+
+                <label for="correo">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl">
+                <br>
+
+                <label for="cantidad_personas">Cantidad de personas *</label>
+                <select id="cantidad_personas_cliente" name="cantidad_personas" required>
+                    <option value="" disabled selected>Seleccione la cantidad de personas</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+
+                <label for="lugar">Lugar *</label>
+                <select id="lugar" name="lugar" required>
+                    <option value="" disabled selected>Seleccione un lugar</option>
+                    {% for lugar in lugares %}<option value="{{ lugar.id }}">{{ lugar.nombre }}</option>{% endfor %}
+                </select>
+                <br>
+
+                <label for="fecha">Fecha *</label>
+                <input type="date" id="fecha" name="fecha" min="{{ today }}" value="{{ today }}"required>
+                <br>
+
+                <label for="hora">Hora *</label>
+                <input type="time" id="hora" name="hora" value="{{ now }}" min="08:00" max="22:00" required>
+                <br>
+
+                <input type="submit" value="Reservar" name="reservacionForm" id="submit">
+                <input type="button" value="Cancelar" id="cancelar" onclick="window.location.href='{% url 'front' %}';">
+            </form>
         </div>
-    </header>
-    <div id="columna_principal">
-        <h2>Hacer Reservaciones</h2>
-        <img src="{% static "img\large.png" %}" height="600" width="800" alt="mapa" id="mapa">
-
-        <form action="" method="post" name="reservacionForm" id="reservacionForm">
-            {% csrf_token %}
-            <label for="nombre">Nombre *</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Nombre" required><br>
-
-            <label for="apellido">Apellido *</label>
-            <input type="text" id="apellido" name="apellido" placeholder="Apellido" required><br>
-
-            <label for="RUT">RUT *</label>
-            <input type="text" id="RUT" name="RUT" placeholder="RUT" required><br>
-
-            <label for="telefono">Teléfono *</label>
-            <input type="text" id="telefono" name="telefono" placeholder="Teléfono" required><br>
-
-            <label for="correo">Correo Electrónico</label>
-            <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl"><br>
-
-            <label for="tipoEvento">Cantidad de personas *</label>
-            <select id="tipoEvento" name="tipoEvento" required>
-                <option value="" disabled selected>Seleccione la cantidad de personas</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-            </select>
-
-            <label for="lugar">Lugar *</label>
-            <select id="lugar" name="lugar" required>
-                <option value="" disabled selected>Seleccione un lugar</option>
-                {% for lugar in lugares %}
-                    <option value="{{ lugar.id }}">{{ lugar.nombre }}</option>
-                {% endfor %}
-            </select><br>
-
-            <label for="fecha">Fecha *</label>
-            <input type="date" id="fecha" name="fecha" min="{{ today }}" value="{{ today }}"required><br>
-
-            <label for="hora">Hora *</label>
-            <input type="time" id="hora" name="hora" value="{{ now }}" min="08:00" max="22:00" required><br>
-
-            <input type="submit" value="Reservar" name="reservacionForm" id="submit" onclick="return validateForm()">
-            <input type="button" value="Cancelar" id="cancelar" onclick="window.location.href='{% url 'front' %}';">
-        </form>
-    </div>
-    <footer>
-        <p> © 2025 Reservas. Todos los derechos reservados.</p>
-    </footer>
-</body>
+        <footer>
+            <p>© 2025 Reservas. Todos los derechos reservados.</p>
+        </footer>
+    </body>
 </html>

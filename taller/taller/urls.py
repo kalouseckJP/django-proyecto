@@ -38,4 +38,5 @@ urlpatterns = [
     path('add_cliente/', views.add_cliente, name='add_cliente'),
     path('add_lugar/', views.add_lugar, name='add_lugar'),
     path('get_lugares/', views.get_all_lugares, name='get_all_lugares'),
+    path('leer_admin/', views.leer_admin, name='leer_admin'),
 ]

@@ -1,18 +1,20 @@
 /* Pagina frontal */
 
-html, body {
+html,
+body {
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-body{
+body {
     background-color: #fddcad;
     padding: 0;
     margin: 0;
 }
 
-header, footer {
+header,
+footer {
     flex: 0;
 }
 
@@ -69,7 +71,7 @@ header button#menu {
     margin: 0;
 }
 
-header button#menu *{
+header button#menu * {
     width: 100%;
 }
 
@@ -92,7 +94,7 @@ header button#menu *{
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin:2rem 0;
+    margin: 2rem 0;
     border-radius: 5px;
 }
 
@@ -104,10 +106,12 @@ img {
 }
 
 @media screen and (max-width: 900px) {
-    header#banner, footer {
+
+    header#banner,
+    footer {
         border-radius: 0;
     }
-    
+
     #columna_principal {
         margin: 0;
         padding: 0;

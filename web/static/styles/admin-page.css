@@ -1,9 +1,11 @@
 body {
-    display: none; /* Esconde la pagina si es que no se autentifica */
+    display: none;
+    /* Esconde la pagina si es que no se autentifica */
 }
 
 body.authenticated {
-    display: block; /* Muestra la pagina cuando se autentifica */
+    display: block;
+    /* Muestra la pagina cuando se autentifica */
 }
 
 .menu {
@@ -25,8 +27,8 @@ body.authenticated {
     padding: 0;
 }
 
-/* Barra lateral izquierda menu */ 
-.admin #admin-options nav{
+/* Barra lateral izquierda menu */
+.admin #admin-options nav {
     margin: 0;
     width: 20%;
     border-right: #1E1E1E solid 1px;
@@ -36,7 +38,7 @@ body.authenticated {
 }
 
 /* Estilo de lista barra lateral izquierda menu */
-.admin #admin-options ul{
+.admin #admin-options ul {
     display: flex;
     list-style-type: none;
     justify-content: center;
@@ -107,7 +109,7 @@ body.authenticated {
     display: none;
 }
 
-/* Separador titulo tabla*/ 
+/* Separador titulo tabla*/
 #admin-content-header {
     display: flex;
     justify-content: space-between;
@@ -175,6 +177,7 @@ table.reservas-table td {
     text-align: center;
     border: 1px solid #ddd;
 }
+
 td.tabla-elem-final {
     width: min-content;
     padding: 8px 5px;
@@ -190,7 +193,7 @@ td.tabla-elem-final button {
     border-radius: 20px;
 }
 
-button.edit-button{
+button.edit-button {
     margin-bottom: 5px;
 }
 
@@ -215,14 +218,20 @@ td.tabla-elem-final button.edit-button:hover {
 /* Modal */
 
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
     padding: auto;
     align-items: center;
     flex-direction: row;
@@ -234,7 +243,7 @@ td.tabla-elem-final button.edit-button:hover {
 
 .modal-content {
     background-color: #fefefe;
-    margin:auto;
+    margin: auto;
     padding: 20px;
     border: 1px solid #888;
     width: min-content;
@@ -258,8 +267,12 @@ form input {
     border: 1px solid #ccc;
 }
 
-.modal input:hover{
+.modal input:hover {
     background-color: #f0f0f0;
+}
+
+.modal input:user-invalid{
+    border-color: RED;
 }
 
 .modal textarea {
@@ -269,7 +282,7 @@ form input {
     border: 1px solid #ccc;
 }
 
-.modal textarea:hover{
+.modal textarea:hover {
     background-color: #f0f0f0;
 }
 
@@ -300,7 +313,7 @@ select:hover {
 
 /* Modal Añadir */
 
-select#add-lugar{
+select#add-lugar {
     padding: 10px;
     margin: 5px 0;
     border-radius: 5px;

@@ -1,15 +1,17 @@
 from django.shortcuts import render
 from datetime import datetime, date
-from .models import Espacios, Reserva, Cliente
-from django.http import JsonResponse
+from .models import Espacios, Reserva, Cliente, Ad
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.db.models import Sum
-from django.utils.timezone import now, timedelta, make_aware, make_naive
+from django.utils.timezone import make_aware
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    response = render(request, 'index.html')
+    response.delete_cookie('loggedIn')
+    return response
 
 def admin(request):
     reservas = Reserva.objects.all()
@@ -21,10 +23,6 @@ def admin(request):
     
     # Crear una lista de lugares con capacidad dinámica
     lugares_con_capacidad = []
-    tiempo_actual = now()
-    rango_inicio = tiempo_actual - timedelta(minutes=60)
-    rango_fin = tiempo_actual + timedelta(minutes=30)
-    print(tiempo_actual, ' ' ,type(rango_inicio), ' ' ,type(rango_fin))
 
     for lugar in lugares:
         # Sumar la cantidad de personas en reservas dentro del rango de tiempo
@@ -57,6 +55,7 @@ def front(request):
 def hacer_reserva(request):
     today = date.today().isoformat() # AAAA-MM-DD
     now = datetime.now().strftime('%H:%M') # HH:MM
+    tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
     lugares = Espacios.objects.all()
     reservas = Reserva.objects.all()
     for lugar in lugares:
@@ -67,7 +66,7 @@ def hacer_reserva(request):
         # Calcular capacidad actual
         capacidad_actual = lugar.capacidadMaxima - reservas_en_rango
         
-    return render(request, 'reservaciones.html', {'today': today, 'now': now, 'lugares': lugares, 'capacidad_actual': capacidad_actual})
+    return render(request, 'reservaciones.html', {'today': today, 'now': now, 'lugares': lugares, 'capacidad_actual': capacidad_actual, 'tiemponow': tiemponow})
 
 def get_cliente(request, RUT):
     cliente = Cliente.objects.get(RUT=RUT)
@@ -207,6 +206,17 @@ def add_reserva(request):
         new_row_html = render_to_string("partials/reserva_row.html", {"reserva": reserva})
         return JsonResponse({"success": True, "new_row_html": new_row_html})
     return JsonResponse({"success": False})
+
+def leer_admin(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        if Ad.objects.filter(nombre=username, contrasena=password).exists():
+            response = JsonResponse({"success": True})
+            response.set_cookie("loggedIn", "true")
+        else:
+            response = JsonResponse({"success": False})
+    return response
 
 def add_cliente(request):
     if request.method == "POST":

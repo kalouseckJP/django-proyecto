@@ -1,45 +1,23 @@
-function validateForm() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-    const validUsername = "admin";
-    const validPassword = "1234";
-
-    if (username === validUsername && password === validPassword) {
-        document.cookie = `loggedIn=true; path=/`;
-        window.location.href = "admin";
-        return false; 
-    } else {
-        document.cookie = `loggedIn=false; path=/`;
-        alert("Usuario o contraseña incorrectos");
-        return false; 
-    }
-}
-
-function inicio() {
-    window.location.href = "/";
-    return false;
-}
-
-document.addEventListener("DOMContentLoaded", function() {
+// #region Autenticado
+function verificarAutenticado(event) {
+    console.log("")
     if (document.body.classList.contains("admin")) {
         const cookies = document.cookie.split(";").map(cookie => cookie.trim());
         const isLoggedIn = cookies.some(cookie => cookie.startsWith("loggedIn=true"));
         if (!isLoggedIn) {
             window.location.href = "/";
         }
-else {
+        else {
             document.body.classList.add("authenticated");
         }
     }
-});
+}
 
-document.addEventListener("DOMContentLoaded", function() {
-    if (document.body.classList.contains("login")) {
-        document.cookie = "loggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    }
-});
+document.addEventListener("DOMContentLoaded", verificarAutenticado);
+// #endregion
 
-document.addEventListener("DOMContentLoaded", function () {
+// #region Cambiar tabla
+function cambiarTabla() {
     const buttons = document.querySelectorAll("nav button");
     const adminContent = document.getElementsByClassName("admin-content")[0];
 
@@ -47,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
         button.addEventListener("click", function () {
             const value = this.value;
             let content = "";
-             test = "";
+            test = "";
 
             switch (value) {
                 case "Productos":
@@ -82,16 +60,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("reporte-content").style.display = "block";
                     // content = "<div id='admin-content-header'><h3>Gestion de Reportes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los reportes.</p>";
                     break;
-                default:    
+                default:
                     content = "<h3>Contenido de Administración</h3><p>Aquí van gestionar los productos, clientes y ventas.</p>";
             }
 
         });
     });
-});
+}
+document.addEventListener("DOMContentLoaded", cambiarTabla);
+// #endregion
 
-// Editar un elemento de la tabla
-document.addEventListener("DOMContentLoaded", () => {
+// #region Editar un elemento de la tabla
+function editaElemento(event) {
     const editButtons = document.querySelectorAll(".edit-button");
     const modal = document.getElementById("edit-modal");
     const modalTitle = document.getElementById("modal-title");
@@ -125,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         `;
 
                         const lugarSelect = document.getElementById("edit-lugar");
-                        fetch(`/get_lugares/`) 
+                        fetch(`/get_lugares/`)
                             .then(response => response.json())
                             .then(data => {
                                 data.forEach(lugar => {
@@ -224,10 +204,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("CATCH Error al guardar los cambios.");
             });
     });
-});
+}
 
-// Eliminar un elemento de la tabla
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", editaElemento);
+// #endregion
+
+// #region Eliminar un elemento de la tabla
+function eliminarElemento(event) {
     const deleteButtons = document.querySelectorAll(".delete-button");
 
     deleteButtons.forEach(button => {
@@ -261,10 +244,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
-});
+}
 
-// Añadir un nuevo elemento a la tabla
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", eliminarElemento);
+// #endregion
+
+// #region Añadir un nuevo elemento a la tabla
+function añadirElemento(event) {
     const addButtons = document.querySelectorAll("#add");
     const addModal = document.getElementById("add-modal");
     const addModalTitle = document.getElementById("add-modal-title");
@@ -367,10 +353,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
     });
-});
+}
 
-// Cerrar el modal al hacer clic fuera de él
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", añadirElemento);
+// #endregion
+
+// #region Cerrar el modal al hacer clic fuera de él
+function cerrarModalFuera(event) {
     const editModal = document.getElementById("edit-modal");
     const editModalContent = editModal.querySelector(".modal-content");
     const addModal = document.getElementById("add-modal");
@@ -397,10 +386,12 @@ document.addEventListener("DOMContentLoaded", () => {
     window.closeAddModal = function () {
         addModal.style.display = "none";
     };
-});
+}
+document.addEventListener("DOMContentLoaded", cerrarModalFuera);
+// #endregion
 
-// Cerrar el modal al presionar la tecla "Esc"
-document.addEventListener("keydown", (event) => {
+// #region Cerrar el modal al presionar la tecla "Esc"
+function cerrarModalESC(event) {
     if (event.key === "Escape") {
         const editModal = document.getElementById("edit-modal");
         const addModal = document.getElementById("add-modal");
@@ -410,80 +401,6 @@ document.addEventListener("keydown", (event) => {
             closeAddModal();
         }
     }
-});
-
-document.addEventListener("input", (event) => {
-    // Restringir el campo de Telefono a un formato específico. "+56912345678", iniciando con +569 forzado
-    if (event.target.name === "telefono") {
-        const input = event.target;
-        let value = input.value.replace(/[^0-9]/g, ""); // Eliminar caracteres no válidos, excepto números
-
-        // Asegurar que el prefijo "+569" siempre esté presente
-        if (!value.startsWith("569")) {
-            value = "569" + value;
-        }
-
-        // Limitar a un máximo de 12 caracteres (incluyendo el prefijo "+569")
-        if (value.length > 11) {
-            value = value.slice(0, 11);
-        }
-
-        // Agregar el "+" al inicio
-        input.value = "+" + value;
-    }
-
-    // Restringir el campo de RUT a un formato específico. "12345678-9"
-    if (event.target.name === "RUT") {
-        const input = event.target;
-        let value = input.value.replace(/[^0-9kK]/g, ""); // Eliminar caracteres no válidos
-    
-        if (value.length > 0) {
-            if (value.length > 9) {
-                // Limitar a un máximo de 9 caracteres antes del guion y 1 después
-                value = value.slice(0, 8) + "-" + value.slice(8, 9);
-            } else if (value.length > 8) {
-                // Agregar el guion automáticamente si tiene más de 8 caracteres
-                value = value.slice(0, 8) + "-" + value.slice(8);
-            }
-        }
-    
-        input.value = value;
-    }
-
-    // Restringir el campo de visitas a un número positivo
-    if (event.target.name === "visitas") {
-        const input = event.target;
-        let value = input.value.replace(/[^0-9]/g, ""); // Eliminar caracteres no válidos, excepto números
-
-        // Limitar a un máximo de 2 dígitos
-        if (value.length > 2) {
-            value = value.slice(0, 2);
-        }
-
-        input.value = value;
-    }
-    // Restringir el campo de capacidad máxima a un número positivo
-    if (event.target.name === "capacidadMaxima") {
-        const input = event.target;
-        let value = input.value.replace(/[^0-9]/g, ""); // Eliminar caracteres no válidos, excepto números
-
-        // Limitar a un máximo de 3 dígitos
-        if (value.length > 3) {
-            value = value.slice(0, 3);
-        }
-
-        input.value = value;
-    }
-    // Restringir el campo de cantidad de personas a un número positivo
-    if (event.target.name === "cantidad_personas") {
-        const input = event.target;
-        let value = input.value.replace(/[^0-9]/g, ""); // Eliminar caracteres no válidos, excepto números
-
-        // Limitar a un máximo de 2 dígitos
-        if (value.length > 2) {
-            value = value.slice(0, 2);
-        }
-
-        input.value = value;
-    }
-});
+}
+document.addEventListener("keydown", cerrarModalESC);
+// #endregion
