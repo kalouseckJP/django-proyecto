@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from .models import Espacios, Reserva, Cliente, Ad
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
-from django.db.models import Sum
+from django.db.models import Sum, Count, F, ExpressionWrapper, IntegerField, Q
 from django.utils.timezone import make_aware
 
 # Create your views here.
@@ -44,13 +44,15 @@ def admin(request):
     return render(request, 'admin.html', {
         'reservas': reservas,
         'clientes': clientes,
-        'lugares': lugares_con_capacidad,  # Usar la lista con capacidad dinámica
+        'lugares': lugares,  # Usar la lista con capacidad dinámica
         'tiempo': tiemponow,
         'today': today,
     })
 
 def front(request):
-    return render(request, 'front.html')
+    response = render(request, 'front.html')
+    response.delete_cookie('loggedIn')
+    return response
 
 def hacer_reserva(request):
     today = date.today().isoformat() # AAAA-MM-DD
@@ -58,6 +60,7 @@ def hacer_reserva(request):
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
     lugares = Espacios.objects.all()
     reservas = Reserva.objects.all()
+    rango = range(1,11)
     for lugar in lugares:
         # Sumar la cantidad de personas en reservas dentro del rango de tiempo
         reservas_en_rango = reservas.filter(
@@ -66,7 +69,7 @@ def hacer_reserva(request):
         # Calcular capacidad actual
         capacidad_actual = lugar.capacidadMaxima - reservas_en_rango
         
-    return render(request, 'reservaciones.html', {'today': today, 'now': now, 'lugares': lugares, 'capacidad_actual': capacidad_actual, 'tiemponow': tiemponow})
+    return render(request, 'reservaciones.html', {'today': today, 'now': now, 'lugares': lugares, 'capacidad_actual': capacidad_actual, 'tiemponow': tiemponow, 'rango': rango,})
 
 def get_cliente(request, RUT):
     cliente = Cliente.objects.get(RUT=RUT)
@@ -188,7 +191,6 @@ def delete_lugar(request, id):
 
 def add_reserva(request):
     if request.method == "POST":
-        # Create a new Reserva object
         cliente = Cliente.objects.get(RUT=request.POST["RUT"])
         lugar = Espacios.objects.get(id=request.POST["espacio"])
         
@@ -203,6 +205,8 @@ def add_reserva(request):
             cantidad_personas=request.POST["cantidad_personas"],
             espacio=lugar,
         )
+        cliente.visitas = cliente.visitas+1
+        cliente.save()
         new_row_html = render_to_string("partials/reserva_row.html", {"reserva": reserva})
         return JsonResponse({"success": True, "new_row_html": new_row_html})
     return JsonResponse({"success": False})
@@ -220,7 +224,6 @@ def leer_admin(request):
 
 def add_cliente(request):
     if request.method == "POST":
-        # Create a new Reserva object
         cliente = Cliente.objects.create(
             RUT=request.POST["RUT"],
             nombre=request.POST["nombre"],
@@ -235,7 +238,6 @@ def add_cliente(request):
 
 def add_lugar(request):
     if request.method == "POST":
-        # Create a new Reserva object
         lugar = Espacios.objects.create(
             nombre=request.POST["nombre"],
             capacidadMaxima=request.POST["capacidadMaxima"],
@@ -248,3 +250,74 @@ def add_lugar(request):
 def get_all_lugares(request):
     lugares = Espacios.objects.all().values('id', 'nombre', 'capacidadMaxima', 'descripcion')
     return JsonResponse(list(lugares), safe=False)
+
+def add_reserva_cliente(request):
+    if request.method == "POST":
+        RUT_cliente = request.POST["RUT"]
+        if Cliente.objects.filter(RUT=RUT_cliente).exists:
+            cliente = Cliente.objects.get(RUT=RUT_cliente)
+            cliente.visitas = cliente.visitas + 1
+            cliente.save()
+        else:
+            Cliente.objects.create(
+                RUT = RUT_cliente,
+                nombre = request.POST["nombre"],
+                apellido = request.POST["apellido"],
+                telefono = request.POST["telefono"],
+                email = request.POST["correo"],
+                visitas = 1,
+            )
+        Reserva.objects.create(
+            RUT = Cliente.objects.get(RUT = RUT_cliente),
+            espacio = Espacios.objects.get(id = request.POST["lugar"]),
+            fecha_reserva = request.POST["fecha"],
+            hora_inicio = request.POST["hora"],
+            cantidad_personas = request.POST["cantidad_personas"]
+        )
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+def get_horarios(request):
+    if request.method == "POST":
+        espacios = Espacios.objects.all()
+        reservas = Reserva.objects.all()
+        fecha = request.POST["fecha"]
+        hora = request.POST["hora"]
+        
+        if fecha and hora:
+            combined_str = f"{fecha} {hora}"  # '2025-05-23 14:30'
+            combined_datetime = datetime.strptime(combined_str, "%Y-%m-%d %H:%M")
+        
+        start_range = combined_datetime - timedelta(minutes=30)
+        end_range = combined_datetime + timedelta(minutes=30)
+                
+        espacios = Espacios.objects.annotate(
+            overlapping_reservas = Count(
+                'reserva',
+                filter=Q(reserva__fecha_reserva__range = (start_range, end_range))
+            ),
+            available_spots = ExpressionWrapper(
+                F('capacidadMaxima') - Count('reserva',filter=Q(reserva__fecha_reserva__range = (start_range, end_range))),
+                output_field = IntegerField()
+            )
+        )
+        for lugares_test in espacios:
+            upd_lugar = Espacios.objects.get(id=lugares_test.id)
+            if upd_lugar.capacidad_actual != lugares_test.available_spots:
+                upd_lugar.capacidad_actual = lugares_test.available_spots
+                upd_lugar.save()
+            print(lugares_test.available_spots)
+        
+        
+        data = [{
+            'id': ele.id,
+            'nombre': ele.nombre,
+            'descripcion': ele.descripcion,
+            'capacidadMaxima': ele. capacidadMaxima,
+            'capacidad_actual': ele.capacidad_actual,
+            'reservas_actuales': ele.overlapping_reservas,
+            'espacio_disponible': ele.available_spots
+        }for ele in espacios]
+        
+        return JsonResponse({'success': True, 'lugares': data})
+    return JsonResponse({'success': False}) 

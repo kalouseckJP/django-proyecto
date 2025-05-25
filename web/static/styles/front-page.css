@@ -28,6 +28,7 @@ header {
     background-color: rgb(220, 159, 80);
     border-end-end-radius: 15px;
     border-end-start-radius: 15px;
+    justify-content: space-around;
 }
 
 footer {
@@ -40,8 +41,7 @@ footer {
     border-start-start-radius: 15px;
 }
 
-header * {
-    width: 50%;
+header>* {
     text-align: center;
 }
 
@@ -51,28 +51,30 @@ header#divLogin {
     margin-right: 5vh;
 }
 
-header button {
-    width: 50%;
+a {
+    text-decoration: none;
+    color: black;
+}
+
+header a#login-button {
     padding: 10px 20px;
     text-align: center;
     font-size: 16px;
     margin: 4px 2px;
     border-radius: 5px;
     border: 1px solid #1E1E1E;
+    background-color: #f8f9fa;
+    text-decoration: none;
+    color: black;
 }
 
-header button#menu {
-    background-color: transparent;
-    border: none;
+header a#menu-button {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    align-content: center;
+    justify-content: center;  
+    background-color: transparent;
     padding: 0;
     margin: 0;
-}
-
-header button#menu * {
-    width: 100%;
 }
 
 #columna_principal {

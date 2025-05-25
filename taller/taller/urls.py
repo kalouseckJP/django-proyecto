@@ -39,4 +39,6 @@ urlpatterns = [
     path('add_lugar/', views.add_lugar, name='add_lugar'),
     path('get_lugares/', views.get_all_lugares, name='get_all_lugares'),
     path('leer_admin/', views.leer_admin, name='leer_admin'),
+    path('add_reserva_cliente/', views.add_reserva_cliente, name='add_reserva_cliente'),
+    path('get_horarios/',views.get_horarios, name='get_horarios'),
 ]

@@ -26,6 +26,12 @@ class Espacios(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     capacidadMaxima = models.IntegerField()
+    capacidad_actual = models.IntegerField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.capacidad_actual:
+            self.capacidad_actual = self.capacidadMaxima
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre
