@@ -1,5 +1,8 @@
 // #region Validar inputs
-// Usa el nombre del input, no su ID o tipo
+/**
+ * Validacion de Inputs, en cada formulario que pida datos se usa esta funcion
+ * @param {*} event Los eventos son cada vez que se interactúa con un input
+ */
 function validarInputs(event) {
     // #region Restringir el campo de Telefono a un formato específico. "+56912345678", iniciando con +569 forzado
     if (event.target.name === "telefono") {
@@ -16,12 +19,12 @@ function validarInputs(event) {
             value = value.slice(0, 11);
         }
 
-        if (value.length < 11) {
+        if (value.length < 11 && (!(document.body.classList.contains("registro")) || (value.length > 3 && value.length < 11))) {
             input.setCustomValidity("Telefóno invalido");
         } else {
             input.setCustomValidity("");
         }
-        
+
         // Agregar el "+" al inicio
         input.value = "+" + value;
     }

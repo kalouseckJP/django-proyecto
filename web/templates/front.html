@@ -19,7 +19,9 @@
         <header id="banner">
             <h1>Menú Principal</h1>
             <div id="divLogin">
-                <a id="login-button" href="{% url "index" %}">Admin</a>
+                <a id="inicio-button" class="header-button" href="{{ 'login_cliente' }}">Inicio Sesión</a>
+                <a id="registro-button" class="header-button" href="{{ "registro" }}">Registro</a>
+                <a id="login-button" class="header-button" href="{% url "index" %}">Admin</a>
             </div>
         </header>
         <div id="columna_principal">

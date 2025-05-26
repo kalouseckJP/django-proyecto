@@ -1,3 +1,8 @@
+
+/**
+ * Hace la reserva por parte del cliente.
+ * @param {*} event 
+ */
 function reservacion_cliente(event) {
     const reservacionForm = document.getElementById("reservacionForm");
     reservacionForm.addEventListener("submit", async event => {
@@ -23,6 +28,10 @@ function reservacion_cliente(event) {
 
 document.addEventListener("DOMContentLoaded", reservacion_cliente);
 
+/**
+ * No se usa.
+ * @returns {Array} Devuelve la hora y fecha en un array
+ */
 function get_hora() {
     const hora = document.getElementById("hora");
     const fecha = document.getElementById("fecha");
@@ -32,6 +41,10 @@ function get_hora() {
     return values
 }
 
+/**
+ * 
+ * @returns Devuelve todos los datos actualizados de los Espacios
+ */
 async function get_cantidad() {
     const reservacionForm = document.getElementById("reservacionForm");
     const formData = new FormData(reservacionForm);
@@ -56,10 +69,9 @@ async function get_cantidad() {
 }
 
 /**
- * 
+ * Actualiza la cantidad de espacios disponibles despues de un cambio eb la reserva
  * @async
- * @param {*} event 
- * 
+ * @param {InputEvent} event El evento es el Input con el que se interactuo ultimo
  */
 async function get_values(event) {
     let personas = document.getElementById("cantidad_personas_cliente").value;
@@ -98,7 +110,7 @@ document.addEventListener("DOMContentLoaded", carga_inicial);
 
 /**
  * @async
- * Actualiza la cantidad de espacios disponibles en cada lugar
+ * Actualiza la cantidad de espacios disponibles en cada lugar en las opciones de HTML
  */
 async function actualizar_capacidad() {
     const lugares = await get_cantidad();
