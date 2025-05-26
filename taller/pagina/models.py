@@ -17,6 +17,7 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=100)
     email = models.EmailField(max_length=100,default="")
     visitas = models.IntegerField(default=0)
+    contrasena = models.CharField(default="123abc", blank=False)
 
     def __str__(self):
         return self.nombre

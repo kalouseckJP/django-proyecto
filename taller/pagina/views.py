@@ -8,6 +8,10 @@ from django.db.models import Sum, Count, F, ExpressionWrapper, IntegerField, Q
 from django.utils.timezone import make_aware
 
 # Create your views here.
+def registro(request):
+    response = render(request, 'registrar.html')
+    return response
+
 def index(request):
     response = render(request, 'index.html')
     response.delete_cookie('loggedIn')
@@ -320,4 +324,37 @@ def get_horarios(request):
         }for ele in espacios]
         
         return JsonResponse({'success': True, 'lugares': data})
-    return JsonResponse({'success': False}) 
+    return JsonResponse({'success': False})
+
+def add_cliente_registro(request):
+    if request.method == "POST":
+        if Cliente.objects.exists(RUT = request.POST["RUT"]):
+            return JsonResponse({"success": True, "existente": True})
+        else:
+            Cliente.objects.create(
+                RUT=request.POST["RUT"],
+                nombre=request.POST["nombre"],
+                apellido=request.POST["apellido"],
+                telefono=request.POST["telefono"],
+                email=request.POST["email"],
+                visitas=0,
+            )
+            return JsonResponse({"success": True, "existente": False})
+    return JsonResponse({"success": False})
+
+def login_cliente(request):
+    response = render(request,'inicio_sesion.html')
+    return response
+
+def validacion_cliente(request):
+    if request.method == "POST":
+        usuario = request.POST["username"]
+        password = request.POSR["password"]
+        match = Cliente.objects.filter(
+            Q(RUT = usuario) | Q(email = usuario) | Q(telefono = usuario)
+        ).first()
+        if match and match.contrasena == password:
+            return JsonResponse({"success": True, "existe": True})
+        else:
+            return JsonResponse({"success": True,"existe": False})
+    return JsonResponse({"success": False})

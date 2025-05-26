@@ -41,4 +41,8 @@ urlpatterns = [
     path('leer_admin/', views.leer_admin, name='leer_admin'),
     path('add_reserva_cliente/', views.add_reserva_cliente, name='add_reserva_cliente'),
     path('get_horarios/',views.get_horarios, name='get_horarios'),
+    path('registro', views.registro, name='registro'),
+    path('add_cliente_registro/', views.add_cliente_registro, name='add_cliente_registro'),
+    path('login_cliente', views.login_cliente, name='login_cliente'),
+    path("validacion_cliente/", views.validacion_cliente, name="validacion_cliente"),
 ]
