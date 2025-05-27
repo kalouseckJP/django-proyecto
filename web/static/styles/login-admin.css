@@ -9,7 +9,7 @@ body {
     flex-direction: column;
 }
 
-div {
+#registroDiv {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,12 +20,31 @@ div {
     border-radius: 7px;
 }
 
-input[type="text"],
-input[type="password"] {
+form {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+}
+
+.formDiv {
+    display: flex;
+    flex-direction: column;
+}
+
+input {
     padding: 10px;
     margin: 5px 0;
     border-radius: 5px;
     border: 1px solid #ccc;
+}
+
+input:hover {
+    border: 1px solid #2C2C2C;
+    background-color: #f5f5f5;
+}
+
+input:user-invalid {
+    border-color: red;
 }
 
 input[type="submit"] {
@@ -47,10 +66,7 @@ input[type="submit"]:hover {
     color: #D9D9D9;
 }
 
-input[type="button"] {
-    border-radius: 5px;
-    padding: 10px;
-    margin: 5px 0;
+a {
     border-radius: 5px;
     border: 1px solid #ccc;
     border: none;
@@ -58,9 +74,37 @@ input[type="button"] {
     font-size: 16px;
     margin: 4px 2px;
     padding: 10px 20px;
-    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    color: black;
 }
 
-input[type="button"]:hover {
+a:hover {
     background-color: #B0B0B0;
+}
+
+span {
+    display: none;
+    color: red;
+    flex: 6 1 auto;
+    min-width: 0;
+    font-size: .8em;
+}
+
+span.error {
+    display: block;
+}
+
+a#registro {
+    color: -webkit-link;
+    text-decoration: underline;
+    cursor: pointer;
+    border-radius: 0;
+    border: 0;
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+    margin: 4px 2px;
+    padding: 10px 20px;
+    text-align: center;
 }

@@ -25,26 +25,6 @@ def admin(request):
     today = date.today().isoformat() # AAAA-MM-DD
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
     
-    # Crear una lista de lugares con capacidad dinámica
-    lugares_con_capacidad = []
-
-    for lugar in lugares:
-        # Sumar la cantidad de personas en reservas dentro del rango de tiempo
-        reservas_en_rango = reservas.filter(
-            espacio=lugar,
-        ).aggregate(total_personas=Sum('cantidad_personas'))['total_personas'] or 0
-        # Calcular capacidad actual
-        capacidad_actual = lugar.capacidadMaxima - reservas_en_rango
-        
-        # Añadir el lugar con su capacidad actual a la lista
-        lugares_con_capacidad.append({
-            'id': lugar.id,
-            'nombre': lugar.nombre,
-            'capacidadMaxima': lugar.capacidadMaxima,
-            'descripcion': lugar.descripcion,
-            'capacidad_actual': capacidad_actual,
-        })
-
     return render(request, 'admin.html', {
         'reservas': reservas,
         'clientes': clientes,
@@ -349,12 +329,24 @@ def login_cliente(request):
 def validacion_cliente(request):
     if request.method == "POST":
         usuario = request.POST["username"]
-        password = request.POSR["password"]
+        password = request.POST["password"]
         match = Cliente.objects.filter(
             Q(RUT = usuario) | Q(email = usuario) | Q(telefono = usuario)
         ).first()
         if match and match.contrasena == password:
-            return JsonResponse({"success": True, "existe": True})
+            response = JsonResponse({"success": True, "existe": True})
+            response.set_cookie(key='user_id',value=match.RUT,max_age=86400,path='/')
+            response.set_cookie(key='user_nombre',value=match.nombre,max_age=86400,path='/')
+            response.set_cookie(key='user_apellido',value=match.apellido,max_age=86400,path='/')
+            return response
         else:
             return JsonResponse({"success": True,"existe": False})
     return JsonResponse({"success": False})
+
+def usuario(request):
+    RUT = Cliente.objects.get(RUT = request.COOKIES.get('user_id'))
+    reservas = Reserva.objects.filter(RUT = RUT)
+    print(reservas)
+    print(request.COOKIES.get('user_id'))
+    return render(request, 'usuario.html', {'reservas': reservas})
+    

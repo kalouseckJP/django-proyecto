@@ -25,4 +25,4 @@ function crear_usuario() {
     })
 }
 
-dEventListener("DOMContentLoaded", crear_usuario)
+document.addEventListener("DOMContentLoaded", crear_usuario)

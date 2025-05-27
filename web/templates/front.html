@@ -11,9 +11,11 @@
         <link rel="stylesheet" href="{% static "styles\general.css" %}">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
         <link rel="shortcut icon" href="{% static "img\large.png" %}" type="image/x-icon">
         <script src="{% static "js\expirar-script.js" %}"></script>
+        <script src="{% static "js\front-script.js" %}"></script>
     </head>
     <body class="frente">
         <header id="banner">
@@ -21,7 +23,7 @@
             <div id="divLogin">
                 <a id="inicio-button" class="header-button" href="{{ 'login_cliente' }}">Inicio Sesión</a>
                 <a id="registro-button" class="header-button" href="{{ "registro" }}">Registro</a>
-                <a id="login-button" class="header-button" href="{% url "index" %}">Admin</a>
+                <a id="login-button" class="header-button" href={% url "index" %}>Admin</a>
             </div>
         </header>
         <div id="columna_principal">

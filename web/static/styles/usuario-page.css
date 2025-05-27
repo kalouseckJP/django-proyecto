@@ -1,8 +1,3 @@
-body {
-    display: none;
-    /* Esconde la pagina si es que no se autentifica */
-}
-
 body.authenticated {
     display: block;
     /* Muestra la pagina cuando se autentifica */
@@ -19,17 +14,16 @@ body.authenticated {
 }
 
 /* Recuadro general */
-.admin #admin-options {
+#admin-options {
     display: flex;
     background-color: #f8f9fa;
     border-radius: 20px;
     border: #1E1E1E solid 1px;
     padding: 0;
-    max-height: 75vh;
 }
 
 /* Barra lateral izquierda menu */
-.admin #admin-options nav {
+#admin-options nav {
     margin: 0;
     width: 20%;
     border-right: #1E1E1E solid 1px;
@@ -39,7 +33,7 @@ body.authenticated {
 }
 
 /* Estilo de lista barra lateral izquierda menu */
-.admin #admin-options ul {
+#admin-options ul {
     display: flex;
     list-style-type: none;
     justify-content: center;
@@ -50,7 +44,7 @@ body.authenticated {
     margin: 0;
 }
 
-.admin #admin-options li {
+#admin-options li {
     width: 100%;
 }
 
@@ -70,12 +64,12 @@ body.authenticated {
     background-color: transparent;
 }
 
-.admin #admin-options nav button:hover {
+#admin-options nav button:hover {
     background-color: #c4c4c4;
 }
 
 /* Estilo boton de salida */
-.admin input[type="submit"]#admin-salida {
+input[type="submit"]#admin-salida {
     background-color: #2C2C2C;
     color: white;
     border: none;
@@ -88,7 +82,7 @@ body.authenticated {
     border-radius: 5px;
 }
 
-.admin input[type="submit"]#admin-salida:hover {
+input[type="submit"]#admin-salida:hover {
     background-color: #1E1E1E;
     color: #D9D9D9;
 }
@@ -143,9 +137,7 @@ body.authenticated {
 }
 
 #admin-content-titles {
-    max-height: 90%;
-    overflow: auto;
-    scrollbar-width: thin;
+    overflow-x: auto;
 }
 
 /* Tabla admin */
