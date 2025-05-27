@@ -13,7 +13,6 @@ function cambiarTabla() {
             switch (value) {
                 case "Reservas":
                     adminContent.style.display = "none";
-                    document.getElementById("lugar-content").style.display = "none";
                     document.getElementById("reserva-content").style.display = "block";
                     // content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
                     break;
@@ -48,8 +47,6 @@ function editaElemento(event) {
                     if (type === "reserva") {
                         modalFields.innerHTML = `
                             <input type="hidden" name="id" value="${data.id}">
-                            <label for="edit-rut">RUT:</label>
-                            <input type="text" id="edit-rut" name="RUT" value="${data.RUT}" required>
                             <label for="add-fecha">Fecha y Hora:</label>
                             <input type="datetime-local" id="add-fecha" name="fecha_reserva" value="${data.now}" min="${data.now}" required>
                             <label for="edit-cantidad">Cantidad de Personas:</label>

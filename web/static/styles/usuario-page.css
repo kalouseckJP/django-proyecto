@@ -20,6 +20,7 @@ body.authenticated {
     border-radius: 20px;
     border: #1E1E1E solid 1px;
     padding: 0;
+    max-height: 75vh;
 }
 
 /* Barra lateral izquierda menu */
@@ -137,7 +138,9 @@ input[type="submit"]#admin-salida:hover {
 }
 
 #admin-content-titles {
-    overflow-x: auto;
+    max-height: 90%;
+    overflow: auto;
+    scrollbar-width: thin;
 }
 
 /* Tabla admin */

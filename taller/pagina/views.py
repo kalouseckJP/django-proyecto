@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.db.models import Sum, Count, F, ExpressionWrapper, IntegerField, Q
 from django.utils.timezone import make_aware
+from django.utils import timezone
 
 # Create your views here.
 def registro(request):
@@ -25,6 +26,7 @@ def admin(request):
     today = date.today().isoformat() # AAAA-MM-DD
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
     
+    print(reservas)
     return render(request, 'admin.html', {
         'reservas': reservas,
         'clientes': clientes,
@@ -345,8 +347,12 @@ def validacion_cliente(request):
 
 def usuario(request):
     RUT = Cliente.objects.get(RUT = request.COOKIES.get('user_id'))
-    reservas = Reserva.objects.filter(RUT = RUT)
+    now_local = timezone.localtime(timezone.now())
+    reservas = Reserva.objects.filter(RUT = RUT, fecha_reserva__gte=now_local)
+    for reserva in reservas:
+        print(reserva.fecha_reserva)
+        print("timezone.now():")
+        print(now_local)
     print(reservas)
-    print(request.COOKIES.get('user_id'))
     return render(request, 'usuario.html', {'reservas': reservas})
     

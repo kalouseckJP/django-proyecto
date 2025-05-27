@@ -36,9 +36,6 @@
             <div id="reserva-content" class="admin-content tablas">
                 <div id="admin-content-header">
                     <h3>Reservas</h3>
-                    <button type="button" id="add" data-type="reserva">
-                        <i class="bi bi-plus-circle"></i> Agregar
-                    </button>
                 </div>
                 <div class="reservas" id="admin-content-titles">
                     <table class="reservas-table">
@@ -97,21 +94,6 @@
                         <!-- Aqui se añaden los campos -->
                     </div>
                     <button type="submit">Guardar Cambios</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Modal para añadir -->
-        <div id="add-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-button" onclick="closeAddModal()"><i class="bi bi-x"></i></span>
-                <h3 id="add-modal-title">Agregar Nuevo</h3>
-                <form id="add-form">
-                    {% csrf_token %}
-                    <div id="add-modal-fields">
-                        <!-- Aqui se añaden los campos -->
-                    </div>
-                    <button type="submit">Agregar</button>
                 </form>
             </div>
         </div>
