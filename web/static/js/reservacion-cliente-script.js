@@ -122,3 +122,22 @@ async function actualizar_capacidad() {
     }
 }
 
+function cerrar_sesion(){
+    const button = document.getElementById("cerrar-sesion")
+    button.addEventListener("click", () => {
+        document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "user_nombre=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "user_apellido=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        window.location.href = "front"
+    })
+}
+
+document.addEventListener("DOMContentLoaded", cerrar_sesion)
+
+function verificarRegistrado(event) {
+    const cookies = document.cookie.split(";").map(cookie => cookie.trim());
+    const isLoggedIn = cookies.some(cookie => cookie.startsWith("user_id"));
+    if (!isLoggedIn) {
+        window.location.href = "/";
+    }
+}

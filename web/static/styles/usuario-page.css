@@ -70,7 +70,7 @@ body.authenticated {
 }
 
 /* Estilo boton de salida */
-input[type="submit"]#admin-salida {
+a{
     background-color: #2C2C2C;
     color: white;
     border: none;
@@ -82,8 +82,7 @@ input[type="submit"]#admin-salida {
     margin: 15px 0px;
     border-radius: 5px;
 }
-
-input[type="submit"]#admin-salida:hover {
+a:hover {
     background-color: #1E1E1E;
     color: #D9D9D9;
 }
@@ -116,24 +115,6 @@ input[type="submit"]#admin-salida:hover {
 
 /* Estilo titulo */
 #admin-content-header h3 {
-    padding: 0;
-}
-
-/* Estilo boton añadir */
-#admin-content-header #add {
-    width: max-content;
-    text-align: center;
-    background-color: #63e163;
-    color: green;
-    border-radius: 20px;
-}
-
-#admin-content-header #add:hover {
-    background-color: #4dff4d;
-    color: #1a8cff;
-}
-
-#admin-content-header #add i {
     padding: 0;
 }
 
@@ -249,7 +230,7 @@ td.tabla-elem-final button.edit-button:hover {
     border: #1E1E1E solid 1px;
 }
 
-form {
+form#edit-form {
     display: flex;
     flex-direction: column;
     background-color: #f9f9f9;
@@ -309,14 +290,38 @@ select:hover {
     background-color: #f0f0f0;
 }
 
-/* Modal Añadir */
+#test {
+    padding: 10px 0;
+}
 
-select#add-lugar {
+#usuario-form {
+    display: grid;
+    grid-auto-columns: 50%;
+    row-gap: 1em;
+}
+
+#usuario-form>*{
     padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 100%;
+    border-radius: 10px;
+}
+
+.categoria {
+    grid-column: 1;
+}
+
+.input-field {
+    grid-column: 2;
+}
+
+#submit.input-field {
+    background-color: #63e163;
+    color: black;
+    justify-self: end;
+    width: 50%;
+    border: 1px solid #08823f;
+}
+#submit.input-field>i{
+    padding: 0;
 }
 
 @media screen and (max-width: 900px) {

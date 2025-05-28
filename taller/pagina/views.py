@@ -46,6 +46,7 @@ def hacer_reserva(request):
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
     lugares = Espacios.objects.all()
     reservas = Reserva.objects.all()
+    cliente = Cliente.objects.get(RUT = request.COOKIES.get("user_id"))
     rango = range(1,11)
     for lugar in lugares:
         # Sumar la cantidad de personas en reservas dentro del rango de tiempo
@@ -55,7 +56,14 @@ def hacer_reserva(request):
         # Calcular capacidad actual
         capacidad_actual = lugar.capacidadMaxima - reservas_en_rango
         
-    return render(request, 'reservaciones.html', {'today': today, 'now': now, 'lugares': lugares, 'capacidad_actual': capacidad_actual, 'tiemponow': tiemponow, 'rango': rango,})
+    return render(request, 'reservaciones.html', 
+                  {'today': today, 
+                   'now': now, 
+                   'lugares': lugares, 
+                   'capacidad_actual': capacidad_actual,
+                   'tiemponow': tiemponow, 
+                   'rango': rango, 
+                   "cliente": cliente})
 
 def get_cliente(request, RUT):
     cliente = Cliente.objects.get(RUT=RUT)
@@ -110,7 +118,6 @@ def edit_reserva(request):
         aware_datetime = make_aware(naive_datetime)
         lugar = Espacios.objects.get(id=request.POST["espacio"])
         
-        id = request.POST.get("id")
         reserva = Reserva.objects.get(id=id)
         reserva.fecha_reserva = aware_datetime
         reserva.hora_inicio = aware_datetime.time()
@@ -239,22 +246,8 @@ def get_all_lugares(request):
 
 def add_reserva_cliente(request):
     if request.method == "POST":
-        RUT_cliente = request.POST["RUT"]
-        if Cliente.objects.filter(RUT=RUT_cliente).exists:
-            cliente = Cliente.objects.get(RUT=RUT_cliente)
-            cliente.visitas = cliente.visitas + 1
-            cliente.save()
-        else:
-            Cliente.objects.create(
-                RUT = RUT_cliente,
-                nombre = request.POST["nombre"],
-                apellido = request.POST["apellido"],
-                telefono = request.POST["telefono"],
-                email = request.POST["correo"],
-                visitas = 1,
-            )
         Reserva.objects.create(
-            RUT = Cliente.objects.get(RUT = RUT_cliente),
+            RUT = Cliente.objects.get(RUT = request.COOKIES.get("user_id")),
             espacio = Espacios.objects.get(id = request.POST["lugar"]),
             fecha_reserva = request.POST["fecha"],
             hora_inicio = request.POST["hora"],
@@ -347,12 +340,7 @@ def validacion_cliente(request):
 
 def usuario(request):
     RUT = Cliente.objects.get(RUT = request.COOKIES.get('user_id'))
-    now_local = timezone.localtime(timezone.now())
+    now_local = timezone.localtime(timezone.now())-timedelta(hours=4)
     reservas = Reserva.objects.filter(RUT = RUT, fecha_reserva__gte=now_local)
-    for reserva in reservas:
-        print(reserva.fecha_reserva)
-        print("timezone.now():")
-        print(now_local)
-    print(reservas)
-    return render(request, 'usuario.html', {'reservas': reservas})
+    return render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT})
     

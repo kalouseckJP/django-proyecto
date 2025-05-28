@@ -23,13 +23,13 @@
                 <ul>
                     <li>
                         <button type="button" value="Reservas">Reservas</button>
+                        <button type="button" value="Datos">Datos Cliente</button>
                     </li>
                 </ul>
             </nav>
             <div class="admin-content">
                 <div id="admin-content-header">
                     <h3>Contenido de Administracion</h3>
-
                 </div>
                 <p>En esta sección puedes gestionar tu perfil.</p>
             </div>
@@ -79,6 +79,28 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <div id="datos" class="admin-content tablas">
+                <div id="admin-content-header">
+                    <h3>Datos</h3>
+                </div>
+                <div class="datos-content" id="admin-content-titles">
+                    <div id="test">
+                        <form method="post" id="usuario-form">
+                            <label for="nombre" class="categoria">Nombre</label>
+                            <input type="text" name="nombre" id="nombre" value={{ cliente.nombre }} class="input-field">
+                            <label for="apellido" class="categoria">Apellido</label>
+                            <input type="text" name="apellido" id="apellido" value={{ cliente.apellido }} class="input-field">
+                            <label for="telefono" class="categoria">Teléfono</label>
+                            <input type="text" name="telefono" id="telefono" value={{ cliente.telefono }} class="input-field">
+                            <label for="email" class="categoria">Correo Electrónico</label>
+                            <input type="email" name="email" id="email" value={{ cliente.email }} class="input-field">
+                            <label for="password" class="categoria">Contraseña</label>
+                            <input type="password" name="password" id="password" value={{ cliente.contrasena }} class="input-field">
+                            <button id="submit" class="input-field" type="submit">Guardar <i class="bi bi-floppy"></i></button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

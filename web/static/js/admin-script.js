@@ -1,6 +1,5 @@
 // #region Autenticado
 function verificarAutenticado(event) {
-    console.log("")
     if (document.body.classList.contains("admin")) {
         const cookies = document.cookie.split(";").map(cookie => cookie.trim());
         const isLoggedIn = cookies.some(cookie => cookie.startsWith("loggedIn=true"));

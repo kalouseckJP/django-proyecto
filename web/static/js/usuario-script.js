@@ -13,9 +13,14 @@ function cambiarTabla() {
             switch (value) {
                 case "Reservas":
                     adminContent.style.display = "none";
+                    document.getElementById("datos").style.display = "none";
                     document.getElementById("reserva-content").style.display = "block";
                     // content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
                     break;
+                case "Datos":
+                    adminContent.style.display = "none";
+                    document.getElementById("reserva-content").style.display = "none";
+                    document.getElementById("datos").style.display = "block";
                 default:
                     content = "<h3>Contenido de Administración</h3><p>Aquí van gestionar los productos, clientes y ventas.</p>";
             }
@@ -71,32 +76,7 @@ function editaElemento(event) {
                             .catch(error => {
                                 console.error("Error fetching lugares:", error);
                             });
-                    } else if (type === "cliente") {
-                        modalFields.innerHTML = `
-                            <input type="hidden" name="RUT" value="${data.RUT}">
-                            <label for="edit-nombre">Nombre:</label>
-                            <input type="text" id="edit-nombre" name="nombre" value="${data.nombre}" required>
-                            <label for="edit-apellido">Apellido:</label>
-                            <input type="text" id="edit-apellido" name="apellido" value="${data.apellido}" required>
-                            <label for="edit-telefono">Teléfono:</label>
-                            <input type="text" id="edit-telefono" name="telefono" value="${data.telefono}" required>
-                            <label for="edit-email">Correo Electrónico:</label>
-                            <input type="email" id="edit-email" name="email" value="${data.email}" required>
-                            <label for="edit-visitas">Visitas:</label>
-                            <input type="number" id="edit-visitas" name="visitas" value="${data.visitas}" required>
-                        `;
-                    } else if (type === "lugar") {
-                        modalFields.innerHTML = `
-                            <input type="hidden" name="id" value="${data.id}">
-                            <label for="edit-nombre">Nombre:</label>
-                            <input type="text" id="edit-nombre" name="nombre" value="${data.nombre}" required>
-                            <label for="edit-capacidad">Capacidad Máxima:</label>
-                            <input type="number" id="edit-capacidad" name="capacidadMaxima" value="${data.capacidadMaxima}" required>
-                            <label for="edit-descripcion">Descripción:</label>
-                            <textarea id="edit-descripcion" name="descripcion" required>${data.descripcion}</textarea>
-                        `;
                     }
-
                     modal.style.display = "flex";
                 });
         });
@@ -202,121 +182,10 @@ function eliminarElemento(event) {
 document.addEventListener("DOMContentLoaded", eliminarElemento);
 // #endregion
 
-// #region Añadir un nuevo elemento a la tabla
-function añadirElemento(event) {
-    const addButtons = document.querySelectorAll("#add");
-    const addModal = document.getElementById("add-modal");
-    const addModalTitle = document.getElementById("add-modal-title");
-    const addModalFields = document.getElementById("add-modal-fields");
-    const addForm = document.getElementById("add-form");
-    addButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            const type = button.getAttribute("data-type");
-
-            addModalTitle.textContent = `Agregar ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-
-            addModalFields.innerHTML = "";
-            if (type === "reserva") {
-                addModalFields.innerHTML = `
-                    <label for="add-rut">RUT:</label>
-                    <input type="text" id="add-rut" name="RUT" required>
-                    <label for="add-fecha">Fecha y Hora:</label>
-                    <input type="datetime-local" id="add-fecha" name="fecha_reserva" required>
-                    <label for="add-cantidad">Cantidad de Personas:</label>
-                    <input type="number" id="add-cantidad" name="cantidad_personas" value="1" min="1" required>
-                    <label for="add-lugar">Lugar:</label>
-                    <select id="add-lugar" name="espacio" required>
-                        <option value="">Seleccione un lugar</option>
-                    </select>
-                `;
-
-                // Fetch lugares from the server and populate the select element
-                const lugarSelect = document.getElementById("add-lugar");
-                fetch(`/get_lugares/`) // Replace with your actual API endpoint
-                    .then(response => response.json())
-                    .then(data => {
-                        // Populate the select element with options
-                        data.forEach(lugar => {
-                            const option = document.createElement("option");
-                            option.value = lugar.id;
-                            option.textContent = lugar.nombre;
-                            lugarSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error("Error fetching lugares:", error);
-                    });
-            } else if (type === "cliente") {
-                addModalFields.innerHTML = `
-                    <label for="add-rut">RUT:</label>
-                    <input type="text" id="add-rut" name="RUT" required>
-                    <label for="add-nombre">Nombre:</label>
-                    <input type="text" id="add-nombre" name="nombre" required>
-                    <label for="add-apellido">Apellido:</label>
-                    <input type="text" id="add-apellido" name="apellido" required>
-                    <label for="add-telefono">Teléfono:</label>
-                    <input type="text" id="add-telefono" name="telefono" value="+569" required>
-                    <label for="add-email">Correo Electrónico:</label>
-                    <input type="email" id="add-email" name="email" required>
-                    <label for="add-visitas">Visitas:</label>
-                    <input type="number" id="add-visitas" name="visitas" value="1" min="1" required>
-                `;
-            } else if (type === "lugar") {
-                addModalFields.innerHTML = `
-                    <label for="add-nombre">Nombre:</label>
-                    <input type="text" id="add-nombre" name="nombre" required>
-                    <label for="add-capacidad">Capacidad Máxima:</label>
-                    <input type="number" id="add-capacidad" name="capacidadMaxima" required>
-                    <label for="add-descripcion">Descripción:</label>
-                    <textarea id="add-descripcion" name="descripcion" required></textarea>
-                `;
-            }
-
-            // Show the modal
-            addModal.style.display = "flex";
-        });
-    });
-
-    window.closeAddModal = function () {
-        addModal.style.display = "none";
-    };
-
-    addForm.addEventListener("submit", event => {
-        event.preventDefault();
-        const formData = new FormData(addForm);
-        const type = addModalTitle.textContent.split(" ")[1].toLowerCase();
-
-        fetch(`/add_${type}/`, {
-            method: "POST",
-            body: formData,
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Add the new row to the table dynamically
-                    const tableBody = document.querySelector(`#${type}-content .reservas-body`);
-                    const newRow = document.createElement("tr");
-                    newRow.innerHTML = data.new_row_html; // Server should return the new row HTML
-                    tableBody.appendChild(newRow);
-
-                    // Close the modal
-                    closeAddModal();
-                } else {
-                    alert("Error al agregar el elemento.");
-                }
-            });
-    });
-}
-
-document.addEventListener("DOMContentLoaded", añadirElemento);
-// #endregion
-
 // #region Cerrar el modal al hacer clic fuera de él
 function cerrarModalFuera(event) {
     const editModal = document.getElementById("edit-modal");
     const editModalContent = editModal.querySelector(".modal-content");
-    const addModal = document.getElementById("add-modal");
-    const addModalContent = addModal.querySelector(".modal-content");
 
     // Cerrar modal de edición al hacer clic fuera de él
     editModal.addEventListener("click", (event) => {
@@ -325,20 +194,10 @@ function cerrarModalFuera(event) {
         }
     });
 
-    // Cerrar modal de añadir al hacer clic fuera de él
-    addModal.addEventListener("click", (event) => {
-        if (!addModalContent.contains(event.target)) {
-            closeAddModal();
-        }
-    });
-
     window.closeModal = function () {
         editModal.style.display = "none";
     };
 
-    window.closeAddModal = function () {
-        addModal.style.display = "none";
-    };
 }
 document.addEventListener("DOMContentLoaded", cerrarModalFuera);
 // #endregion
@@ -347,7 +206,6 @@ document.addEventListener("DOMContentLoaded", cerrarModalFuera);
 function cerrarModalESC(event) {
     if (event.key === "Escape") {
         const editModal = document.getElementById("edit-modal");
-        const addModal = document.getElementById("add-modal");
         if (editModal.style.display === "flex") {
             closeModal();
         } else if (addModal.style.display === "flex") {

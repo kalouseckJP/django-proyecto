@@ -25,9 +25,8 @@
                 <h1>Menú Principal</h1>
             </a>
             <div id="divLogin">
-                <a id="inicio-button" class="header-button" href="">Inicio Sesión</a>
-                <a id="registro-button" class="header-button" href="{{ "registro" }}">Registro</a>
-                <a id="login-button" class="header-button" href="{% url "index" %}">Admin</a>
+                <a id="user-button" class="header-button" href={{ "usuario" }}>{{ cliente.nombre }} {{ cliente.apellido }} <i class="bi bi-person-circle"></i></a>
+                <button id="cerrar-sesion" class="header-button">Cerrar Sesion</button>
             </div>
         </header>
         <div id="columna_principal">
@@ -36,26 +35,6 @@
 
             <form action="" method="post" name="reservacionForm" id="reservacionForm">
                 {% csrf_token %}
-                <label for="nombre">Nombre *</label>
-                <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
-                <br>
-
-                <label for="apellido">Apellido *</label>
-                <input type="text" id="apellido" name="apellido" placeholder="Apellido" required>
-                <br>
-
-                <label for="RUT">RUT *</label>
-                <input type="text" id="RUT" name="RUT" placeholder="RUT" required>
-                <br>
-
-                <label for="telefono">Teléfono *</label>
-                <input type="text" id="telefono" name="telefono" value="+569" required>
-                <br>
-
-                <label for="correo">Correo Electrónico</label>
-                <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl">
-                <br>
-
                 <label for="fecha">Fecha *</label>
                 <input type="date" id="fecha" name="fecha" min="{{ today }}" value="{{ today }}"required>
                 <br>
