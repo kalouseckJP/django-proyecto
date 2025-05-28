@@ -88,6 +88,7 @@
                 <div class="datos-content" id="admin-content-titles">
                     <div id="test">
                         <form method="post" id="usuario-form">
+                            <input hidden id="rut-cliente" value={{ cliente.RUT }}></input>
                             <label for="nombre" class="categoria">Nombre</label>
                             <input type="text" name="nombre" id="nombre" value={{ cliente.nombre }} class="input-field">
                             <label for="apellido" class="categoria">Apellido</label>
@@ -98,6 +99,7 @@
                             <input type="email" name="email" id="email" value={{ cliente.email }} class="input-field">
                             <label for="password" class="categoria">Contraseña</label>
                             <input type="password" name="password" id="password" value={{ cliente.contrasena }} class="input-field">
+                            <button type="button" class="categoria" id="eliminar">Eliminar Usuario <i class="bi bi-trash"></i></button>
                             <button id="submit" class="input-field" type="submit">Guardar <i class="bi bi-floppy"></i></button>
                         </form>
                     </div>

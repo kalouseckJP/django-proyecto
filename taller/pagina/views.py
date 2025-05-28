@@ -112,7 +112,7 @@ def get_reserva(request, id):
 @csrf_exempt
 def edit_reserva(request):
     if request.method == "POST":
-        
+        id = request.POST["id"]
         fecha_reserva = request.POST["fecha_reserva"]
         naive_datetime = datetime.fromisoformat(fecha_reserva)
         aware_datetime = make_aware(naive_datetime)
@@ -303,18 +303,23 @@ def get_horarios(request):
 
 def add_cliente_registro(request):
     if request.method == "POST":
-        if Cliente.objects.exists(RUT = request.POST["RUT"]):
+        if Cliente.objects.filter(RUT = request.POST["RUT"]).exists():
             return JsonResponse({"success": True, "existente": True})
         else:
             Cliente.objects.create(
                 RUT=request.POST["RUT"],
-                nombre=request.POST["nombre"],
+                nombre=request.POST["username"],
                 apellido=request.POST["apellido"],
                 telefono=request.POST["telefono"],
                 email=request.POST["email"],
                 visitas=0,
             )
-            return JsonResponse({"success": True, "existente": False})
+            cliente = Cliente.objects.get(RUT = request.POST["RUT"])
+            response = JsonResponse({"success": True, "existente": False})
+            response.set_cookie(key='user_id',value=cliente.RUT,max_age=86400,path='/')
+            response.set_cookie(key='user_nombre',value=cliente.nombre,max_age=86400,path='/')
+            response.set_cookie(key='user_apellido',value=cliente.apellido,max_age=86400,path='/')
+            return response
     return JsonResponse({"success": False})
 
 def login_cliente(request):
@@ -341,6 +346,9 @@ def validacion_cliente(request):
 def usuario(request):
     RUT = Cliente.objects.get(RUT = request.COOKIES.get('user_id'))
     now_local = timezone.localtime(timezone.now())-timedelta(hours=4)
+
+    print(timezone.now())
+    print(now_local)
     reservas = Reserva.objects.filter(RUT = RUT, fecha_reserva__gte=now_local)
     return render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT})
     
