@@ -153,7 +153,7 @@ body.authenticated {
 table.reservas-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 table.reservas-table th {

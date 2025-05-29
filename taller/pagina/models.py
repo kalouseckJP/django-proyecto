@@ -37,17 +37,6 @@ class Espacios(models.Model):
     def __str__(self):
         return self.nombre
 
-class Reserva(models.Model):
-    id = models.AutoField(primary_key=True)
-    RUT = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    espacio = models.ForeignKey(Espacios, on_delete=models.CASCADE)
-    fecha_reserva = models.DateTimeField(default=timezone.now)
-    hora_inicio = models.TimeField(default=timezone.now)
-    cantidad_personas = models.IntegerField(default=1)
-
-    def __str__(self):
-        return f"Reserva {self.id} - RUT:{self.RUT.RUT} - {self.espacio.nombre} - Cantidad: {self.cantidad_personas}"
-
 class Inventario(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
@@ -69,7 +58,25 @@ class Mesas(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nombre
+        return f"Mesa {self.id} - Capacidad: {self.capacidadMesa} - Tamaño: {self.tamanoMesa}"
+    
+class Reserva(models.Model):
+    id = models.AutoField(primary_key=True)
+    RUT = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    espacio = models.ForeignKey(Espacios, on_delete=models.CASCADE)
+    fecha_reserva = models.DateTimeField(default=timezone.now)
+    hora_inicio = models.TimeField(default=timezone.now)
+    cantidad_personas = models.IntegerField(default=1)
+    mesas =  models.ManyToManyField(Mesas, through='ReservationTable')
 
     def __str__(self):
-        return f"Mesa {self.id} - Capacidad: {self.capacidadMesa} - Tamaño: {self.tamanoMesa}"
+        return f"Reserva {self.id} - RUT:{self.RUT.RUT} - {self.espacio.nombre} - Cantidad: {self.cantidad_personas}"
+
+
+class ReservationTable(models.Model):
+    reservacion = models.ForeignKey(Reserva, on_delete=models.CASCADE)
+    mesa = models.ForeignKey(Mesas, on_delete=models.CASCADE)
+    cantidadUsada = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.cantidadUsada} x {self.mesa} for {self.reservacion}"

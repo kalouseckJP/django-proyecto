@@ -217,7 +217,7 @@ function editarElemento(event) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", editarElemento);
+document.addEventListener("click", editarElemento);
 // #endregion
 
 // #region Eliminar un elemento de la tabla
@@ -257,7 +257,7 @@ function eliminarElemento(event) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", eliminarElemento);
+document.addEventListener("click", eliminarElemento);
 // #endregion
 
 // #region Añadir un nuevo elemento a la tabla
