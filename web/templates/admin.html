@@ -34,6 +34,9 @@
                         <button type="button" value="Lugares">Lugares</button>
                     </li>
                     <li>
+                        <button type="button" value="Mesas">Mesas</button>
+                    </li>
+                    <li>
                         <button type="button" value="Reportes">Reportes</button>
                     </li>
                 </ul>
@@ -184,6 +187,48 @@
                 <div id="admin-content-header">
                     <h3>Reportes</h3>
                 </div>
+            </div>
+            <div id="mesas-content" class="admin-content tablas">
+                <div id="admin-content-header">
+                    <h3>Tablas</h3>
+                    <button type="button" id="add" data-type="lugar">
+                        <i class="bi bi-plus-circle"></i> Agregar
+                    </button>
+                </div>
+                <div class="reservas" id="admin-content-titles">
+                    <table class="reservas-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tamaño Mesa</th>
+                                <th>Capacidad</th>
+                                <th>Cantidad Maxima</th>
+                                <th>Cantidad Actual</th>
+                                <th class="tabla-elem-final"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="reservas-body">
+                            {% for mesa in mesas %}
+                                <tr>
+                                    <td>{{ mesa.id }}</td>
+                                    <td>{{ mesa.tamanoMesa }}</td>
+                                    <td>{{ mesa.capacidadMesa }}</td>
+                                    <td>{{ mesa.cantidadMesas }}</td>
+                                    <td>{{ mesa.cantidadActual }}</td>
+                                    <td class="tabla-elem-final">
+                                        <button type="button" class="edit-button" data-id="{{ reserva.id }}" data-type="reserva">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+                                        <button type="button" class="delete-button" data-id="{{ reserva.id }}" data-type="reserva">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
         <input id="admin-salida" type="submit" value="Salir" onclick="window.location.href='{% url "index" %}'">

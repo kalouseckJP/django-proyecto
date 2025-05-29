@@ -61,6 +61,15 @@ class Mesas(models.Model):
     capacidadMesa = models.IntegerField()
     tamanoMesa = models.IntegerField()
     cantidadMesas = models.IntegerField()
+    cantidadActual = models.IntegerField()
+    
+    def save(self, *args, **kwargs):
+        if not self.cantidadActual:
+            self.cantidadActual = self.cantidadMesas
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.nombre
 
     def __str__(self):
         return f"Mesa {self.id} - Capacidad: {self.capacidadMesa} - Tamaño: {self.tamanoMesa}"

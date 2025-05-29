@@ -68,7 +68,7 @@ function validarInputs(event) {
             input.setCustomValidity("")
 
         }
-
+        
         input.value = value;
     }
     // #endregion
@@ -113,7 +113,36 @@ function validarInputs(event) {
 
         input.value = value;
     }
+    
     // #endregion
+    if (event.target.name === "password"){
+        const input = event.target;
+        const value = input.value
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{8,}$/;
+
+        if (!(regex.test(value))) {
+            input.setCustomValidity(`Contraseña invalida. Su contraseña debe tener una combinación de:
+                                    \nMayusculas
+                                    \nMinusculas
+                                    \nNumeros
+                                    \nSimbolos como !@#$%
+                                    \nY debe ser de por lo menos 8 caracteres
+                                    `)
+        } else {
+            input.setCustomValidity("");
+        }
+    }
+
+    if(event.target.name === "username" || event.target.name === "apellido"){
+        const input = event.target;
+        const value = input.value
+        const regex = /\d/;
+        if ((regex.test(value))) {
+            input.setCustomValidity("No puede contener solo numeros");
+        } else {
+            input.setCustomValidity("")
+        }
+    }
 }
 
 document.addEventListener("input", validarInputs);

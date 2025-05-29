@@ -33,6 +33,7 @@ function cambiarTabla() {
                     document.getElementById("cliente-content").style.display = "none";
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("reserva-content").style.display = "block";
+                    document.getElementById("mesas-content").style.display = "none";
                     // content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
                     break;
                 case "Clientes":
@@ -41,6 +42,7 @@ function cambiarTabla() {
                     document.getElementById("lugar-content").style.display = "none";
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("cliente-content").style.display = "block";
+                    document.getElementById("mesas-content").style.display = "none";
                     // content = "<div id='admin-content-header'><h3>Gestion de Clientes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los clientes.</p>";
                     break;
                 case "Lugares":
@@ -49,6 +51,7 @@ function cambiarTabla() {
                     document.getElementById("cliente-content").style.display = "none";
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("lugar-content").style.display = "block";
+                    document.getElementById("mesas-content").style.display = "none";
                     // content = "<div id='admin-content-header'><h3>Gestion de Ventas</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los ventas.</p>";
                     break;
                 case "Reportes":
@@ -57,8 +60,17 @@ function cambiarTabla() {
                     document.getElementById("cliente-content").style.display = "none";
                     document.getElementById("lugar-content").style.display = "none";
                     document.getElementById("reporte-content").style.display = "block";
+                    document.getElementById("mesas-content").style.display = "none";
                     // content = "<div id='admin-content-header'><h3>Gestion de Reportes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los reportes.</p>";
                     break;
+                case "Mesas":
+                    adminContent.style.display = "none";
+                    document.getElementById("reserva-content").style.display = "none";
+                    document.getElementById("cliente-content").style.display = "none";
+                    document.getElementById("lugar-content").style.display = "none";
+                    document.getElementById("reporte-content").style.display = "none";
+                    document.getElementById("mesas-content").style.display = "block";
+
                 default:
                     content = "<h3>Contenido de Administración</h3><p>Aquí van gestionar los productos, clientes y ventas.</p>";
             }
@@ -70,7 +82,7 @@ document.addEventListener("DOMContentLoaded", cambiarTabla);
 // #endregion
 
 // #region Editar un elemento de la tabla
-function editaElemento(event) {
+function editarElemento(event) {
     const editButtons = document.querySelectorAll(".edit-button");
     const modal = document.getElementById("edit-modal");
     const modalTitle = document.getElementById("modal-title");
@@ -205,7 +217,7 @@ function editaElemento(event) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", editaElemento);
+document.addEventListener("DOMContentLoaded", editarElemento);
 // #endregion
 
 // #region Eliminar un elemento de la tabla

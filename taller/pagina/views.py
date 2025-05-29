@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from datetime import datetime, date, timedelta
-from .models import Espacios, Reserva, Cliente, Ad
+from .models import Espacios, Reserva, Cliente, Ad, Mesas
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
@@ -22,6 +22,7 @@ def admin(request):
     reservas = Reserva.objects.all()
     clientes = Cliente.objects.all()
     lugares = Espacios.objects.all()
+    mesas = Mesas.objects.all()
     
     today = date.today().isoformat() # AAAA-MM-DD
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
@@ -33,6 +34,7 @@ def admin(request):
         'lugares': lugares,  # Usar la lista con capacidad dinámica
         'tiempo': tiemponow,
         'today': today,
+        'mesas': mesas,
     })
 
 def front(request):
@@ -81,6 +83,8 @@ def get_cliente(request, RUT):
 def edit_cliente(request):
     if request.method == "POST":
         rut = request.POST.get("RUT")
+        print("rut: ")
+        print(rut)
         cliente = Cliente.objects.get(RUT=rut)
         cliente.nombre = request.POST.get("nombre")
         cliente.apellido = request.POST.get("apellido")
@@ -89,6 +93,25 @@ def edit_cliente(request):
         cliente.visitas = request.POST.get("visitas")
         cliente.save()
         return JsonResponse({"success": True, "RUT": cliente.RUT, "nombre": cliente.nombre, "apellido": cliente.apellido, "telefono": cliente.telefono, "email": cliente.email, "visitas": cliente.visitas})
+    return JsonResponse({"success": False})
+
+@csrf_exempt
+def edit_usuario(request):
+    if request.method == "POST":
+        rut = request.POST.get("RUT")
+        print("rut: ")
+        print(rut)
+        cliente = Cliente.objects.get(RUT=rut)
+        cliente.nombre = request.POST.get("nombre")
+        cliente.apellido = request.POST.get("apellido")
+        cliente.telefono = request.POST.get("telefono")
+        cliente.email = request.POST.get("email")
+        cliente.contrasena = request.POST.get("password")
+        cliente.save()
+        response = JsonResponse({"success": True})
+        response.set_cookie(key='user_nombre',value=cliente.nombre,max_age=86400,path='/')
+        response.set_cookie(key='user_apellido',value=cliente.apellido,max_age=86400,path='/')
+        return response
     return JsonResponse({"success": False})
 
 def get_reserva(request, id):
@@ -312,6 +335,7 @@ def add_cliente_registro(request):
                 apellido=request.POST["apellido"],
                 telefono=request.POST["telefono"],
                 email=request.POST["email"],
+                contrasena=request.POST["password"],
                 visitas=0,
             )
             cliente = Cliente.objects.get(RUT = request.POST["RUT"])
@@ -350,5 +374,50 @@ def usuario(request):
     print(timezone.now())
     print(now_local)
     reservas = Reserva.objects.filter(RUT = RUT, fecha_reserva__gte=now_local)
-    return render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT})
+    if not reservas:
+        response = render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT, 'vacio': True})
+    else:
+        response = render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT, 'vacio': False})
+    return response
+
+def get_horarios_usuario(request):
+    if request.method == "POST":
+        espacios = Espacios.objects.all()
+        fecha_reserva = request.POST["fecha_reserva"]
+        naive_datetime = datetime.fromisoformat(fecha_reserva)
+        aware_datetime = make_aware(naive_datetime)
+        
+        start_range = aware_datetime - timedelta(minutes=30)
+        end_range = aware_datetime + timedelta(minutes=30)
+                
+        espacios = Espacios.objects.annotate(
+            overlapping_reservas = Count(
+                'reserva',
+                filter=Q(reserva__fecha_reserva__range = (start_range, end_range))
+            ),
+            available_spots = ExpressionWrapper(
+                F('capacidadMaxima') - Count('reserva',filter=Q(reserva__fecha_reserva__range = (start_range, end_range))),
+                output_field = IntegerField()
+            )
+        )
+        for lugares_test in espacios:
+            upd_lugar = Espacios.objects.get(id=lugares_test.id)
+            if upd_lugar.capacidad_actual != lugares_test.available_spots:
+                upd_lugar.capacidad_actual = lugares_test.available_spots
+                upd_lugar.save()
+            print(lugares_test.available_spots)
+        
+        
+        data = [{
+            'id': ele.id,
+            'nombre': ele.nombre,
+            'descripcion': ele.descripcion,
+            'capacidadMaxima': ele. capacidadMaxima,
+            'capacidad_actual': ele.capacidad_actual,
+            'reservas_actuales': ele.overlapping_reservas,
+            'espacio_disponible': ele.available_spots
+        }for ele in espacios]
+        
+        return JsonResponse({'success': True, 'lugares': data})
+    return JsonResponse({'success': False})
     

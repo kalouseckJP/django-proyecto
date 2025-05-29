@@ -8,7 +8,6 @@ function cliente_logged() {
             return true
         }
     }
-    console.log(x)
     return false
 }
 
@@ -39,23 +38,23 @@ function cambiar_inicio() {
 document.addEventListener("DOMContentLoaded", cambiar_inicio)
 
 function cerrar_sesion(){
-    const button = document.getElementById("cerrar-sesion")
-    button.addEventListener("click", () => {
-        document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "user_nombre=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "user_apellido=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        window.location.reload();
-    })
+    if(cliente_logged()){
+        const button = document.getElementById("cerrar-sesion")
+        button.addEventListener("click", () => {
+            document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "user_nombre=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "user_apellido=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.reload();
+        })
+    }
 }
 
 document.addEventListener("DOMContentLoaded", cerrar_sesion)
 
 function accion_boton_reserva() {
     const button = document.getElementById("hacer-reserva-button");
-    console.log("test23")
     button.addEventListener("click", () => {
         if (cliente_logged()) {
-            console.log('test')
             window.location.href = "reservaciones"
         }else {
             window.location.href = "login_cliente"

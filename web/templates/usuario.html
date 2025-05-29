@@ -4,6 +4,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Gestión de usuario y reservas en el panel de administración.">
+        <meta name="keywords" content="usuario, reservas, administración, perfil, datos, Django">
         <title>Usuario</title>
         <link rel="stylesheet" href="{% static "styles\usuario-page.css" %}">
         <link rel="stylesheet" href="{% static "styles\general.css" %}">
@@ -14,6 +16,7 @@
         <link rel="shortcut icon" href="{% static "img\large.png" %}" type="image/x-icon">
         <script src="{% static "js\expirar-script.js" %}"></script>
         <script src={% static "js\usuario-script.js" %}></script>
+        <script src={% static "js\validaciones-script.js" %}></script>
     </head>
     <body>
         <h1>Menú Admin</h1>
@@ -38,47 +41,52 @@
                     <h3>Reservas</h3>
                 </div>
                 <div class="reservas" id="admin-content-titles">
-                    <table class="reservas-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>RUT</th>
-                                <th>Teléfono</th>
-                                <th>Correo Electrónico</th>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Cantidad de Personas</th>
-                                <th>Lugar</th>
-                                <th class="tabla-elem-final"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="reservas-body">
-                            {% for reserva in reservas %}
+                    {% if vacio %}
+                        <p>No hay reservas activas</p>
+                    {% else %}
+                        <table class="reservas-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ reserva.id }}</td>
-                                    <td>{{ reserva.RUT.nombre }}</td>
-                                    <td>{{ reserva.RUT.apellido }}</td>
-                                    <td>{{ reserva.RUT.RUT }}</td>
-                                    <td>{{ reserva.RUT.telefono }}</td>
-                                    <td>{{ reserva.RUT.email }}</td>
-                                    <td>{{ reserva.fecha_reserva }}</td>
-                                    <td>{{ reserva.hora_inicio }}</td>
-                                    <td>{{ reserva.cantidad_personas }}</td>
-                                    <td>{{ reserva.espacio.nombre }}</td>
-                                    <td class="tabla-elem-final">
-                                        <button type="button" class="edit-button" data-id="{{ reserva.id }}" data-type="reserva">
-                                            <i class="bi bi-pencil-square"></i> Editar
-                                        </button>
-                                        <button type="button" class="delete-button" data-id="{{ reserva.id }}" data-type="reserva">
-                                            <i class="bi bi-trash"></i> Eliminar
-                                        </button>
-                                    </td>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>RUT</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo Electrónico</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Cantidad de Personas</th>
+                                    <th>Lugar</th>
+                                    <th class="tabla-elem-final"></th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="reservas-body">
+                                {% for reserva in reservas %}
+                                    <tr>
+                                        <td>{{ reserva.id }}</td>
+                                        <td>{{ reserva.RUT.nombre }}</td>
+                                        <td>{{ reserva.RUT.apellido }}</td>
+                                        <td>{{ reserva.RUT.RUT }}</td>
+                                        <td>{{ reserva.RUT.telefono }}</td>
+                                        <td>{{ reserva.RUT.email }}</td>
+                                        <td>{{ reserva.fecha_reserva }}</td>
+                                        <td>{{ reserva.hora_inicio }}</td>
+                                        <td>{{ reserva.cantidad_personas }}</td>
+                                        <td>{{ reserva.espacio.nombre }}</td>
+                                        <td class="tabla-elem-final">
+                                            <button type="button" class="edit-button" data-id="{{ reserva.id }}" data-type="reserva">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </button>
+                                            <button type="button" class="delete-button" data-id="{{ reserva.id }}" data-type="reserva">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+
                 </div>
             </div>
             <div id="datos" class="admin-content tablas">
@@ -87,20 +95,27 @@
                 </div>
                 <div class="datos-content" id="admin-content-titles">
                     <div id="test">
-                        <form method="post" id="usuario-form">
-                            <input hidden id="rut-cliente" value={{ cliente.RUT }}></input>
+                        <form method="post" id="usuarioForm">
+                            <input hidden id="RUT" name="RUT" value={{ cliente.RUT }}>
                             <label for="nombre" class="categoria">Nombre</label>
-                            <input type="text" name="nombre" id="nombre" value={{ cliente.nombre }} class="input-field">
+                            <input type="text" name="nombre" id="nombre" value={{ cliente.nombre }} class="input-field" placeholder="Nombre">
                             <label for="apellido" class="categoria">Apellido</label>
-                            <input type="text" name="apellido" id="apellido" value={{ cliente.apellido }} class="input-field">
+                            <input type="text" name="apellido" id="apellido" value="{{ cliente.apellido }}" class="input-field" placeholder="Apellido">
                             <label for="telefono" class="categoria">Teléfono</label>
-                            <input type="text" name="telefono" id="telefono" value={{ cliente.telefono }} class="input-field">
+                            <input type="text" name="telefono" id="telefono" value="{{ cliente.telefono }}" class="input-field" placeholder="Telefono">
                             <label for="email" class="categoria">Correo Electrónico</label>
-                            <input type="email" name="email" id="email" value={{ cliente.email }} class="input-field">
+                            <input type="email" name="email" id="email" value="{{ cliente.email }}" class="input-field" placeholder="Correo Electrónico">
                             <label for="password" class="categoria">Contraseña</label>
-                            <input type="password" name="password" id="password" value={{ cliente.contrasena }} class="input-field">
-                            <button type="button" class="categoria" id="eliminar">Eliminar Usuario <i class="bi bi-trash"></i></button>
-                            <button id="submit" class="input-field" type="submit">Guardar <i class="bi bi-floppy"></i></button>
+                            <div class="password-wrapper input-field">
+                                <input type="password" name="password" id="password" value={{ cliente.contrasena }} class="input-field" placeholder="Contraseña">
+                                <button type="button" class="toggle-button" onclick="togglePassword(this)">Show</button>
+                            </div>
+                            <button type="button" class="categoria" id="eliminar">
+                                Eliminar Usuario <i class="bi bi-trash"></i>
+                            </button>
+                            <button type="submit" class="input-field" id="submit" name="usuarioForm">
+                                Guardar <i class="bi bi-floppy"></i>
+                            </button>
                         </form>
                     </div>
                 </div>

@@ -8,7 +8,6 @@ function reservacion_cliente(event) {
     reservacionForm.addEventListener("submit", async event => {
         event.preventDefault();
         const formData = new FormData(reservacionForm);
-        console.log("estas aqui")
         await fetch("/add_reserva_cliente/", {
             method: "POST",
             body: formData,
@@ -17,7 +16,7 @@ function reservacion_cliente(event) {
             .then(data => {
                 if (data.success) {
                     alert("Reservación creada correctamente")
-                    console.log("deberia haber funcionado")
+                    window.location.href = "front"
                 } else {
                     alert("Error al crear reservación")
                     console.log("Falló")
@@ -79,12 +78,6 @@ async function get_values(event) {
     horario[0] = document.getElementById("hora").value;
     horario[1] = document.getElementById("fecha").value;
 
-    if (event.target.id === "cantidad_personas_cliente") {
-        const cantidad = event.target
-        let value = cantidad.value;
-        console.log(value);
-    }
-
     if (event.target.id === "hora" || event.target.id === "fecha") {
         horario = get_hora();
     }
@@ -102,7 +95,6 @@ document.addEventListener("input", get_values);
  * En cuanto se abre la pagina se hace una lectura y actulzacion inicial de la capacidad
  */
 async function carga_inicial() {
-    let horario = get_hora();
     await actualizar_capacidad();
 }
 
