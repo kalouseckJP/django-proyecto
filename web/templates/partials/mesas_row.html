@@ -1,0 +1,15 @@
+<tr>
+    <td>{{ mesa.id }}</td>
+    <td>{{ mesa.tamanoMesa }}</td>
+    <td>{{ mesa.capacidadMesa }}</td>
+    <td>{{ mesa.cantidadMesas }}</td>
+    <td>{{ mesa.cantidadActual }}</td>
+    <td class="tabla-elem-final">
+        <button type="button" class="edit-button" data-id="{{ mesa.id }}" data-type="mesas">
+            <i class="bi bi-pencil-square"></i> Editar
+        </button>
+        <button type="button" class="delete-button" data-id="{{ mesa.id }}" data-type="mesas">
+            <i class="bi bi-trash"></i> Eliminar
+        </button>
+    </td>
+</tr>

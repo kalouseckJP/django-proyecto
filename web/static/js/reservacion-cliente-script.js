@@ -18,6 +18,9 @@ function reservacion_cliente(event) {
                     alert("Reservación creada correctamente")
                     window.location.href = "front"
                 } else {
+                    if(data.error){
+                        alert("No hay mesas disponibles para este horario")
+                    }
                     alert("Error al crear reservación")
                     console.log("Falló")
                 }
@@ -28,17 +31,32 @@ function reservacion_cliente(event) {
 document.addEventListener("DOMContentLoaded", reservacion_cliente);
 
 /**
- * No se usa.
- * @returns {Array} Devuelve la hora y fecha en un array
+ * Limita la hora 30 minutos desde este momento
  */
-function get_hora() {
-    const hora = document.getElementById("hora");
-    const fecha = document.getElementById("fecha");
-    let values = [];
-    values[0] = hora.value;
-    values[1] = fecha.value;
-    return values
+function limitar_horario() {
+    const inputHora = document.getElementById("hora");
+    const inputDia = document.getElementById("fecha");
+
+    let value = inputHora.value;
+    const date = new Date();
+    const currentMinutes = date.getMinutes();
+    date.setMinutes(currentMinutes + 30);
+    inputHora.min = `${date.getHours()}:${date.getMinutes()}`;
+    
+    value = value.split(":");
+    let tiempo = parseInt(value[0] * 60) + parseInt(value[1]);
+    const comparacion = date.getHours() * 60 + date.getMinutes();
+
+    console.log(inputDia.max)
+    if((inputDia.value.split("-"))[2] == date.getDate() && tiempo < comparacion) {
+        inputHora.setCustomValidity("Su reserva debe ser realizada por lo menos 30 minutos en avance.")
+    } else {
+        inputHora.setCustomValidity("")
+
+    }
 }
+
+document.addEventListener("input", limitar_horario);
 
 /**
  * 
@@ -73,18 +91,7 @@ async function get_cantidad() {
  * @param {InputEvent} event El evento es el Input con el que se interactuo ultimo
  */
 async function get_values(event) {
-    let personas = document.getElementById("cantidad_personas_cliente").value;
-    let horario = [];
-    horario[0] = document.getElementById("hora").value;
-    horario[1] = document.getElementById("fecha").value;
-
-    if (event.target.id === "hora" || event.target.id === "fecha") {
-        horario = get_hora();
-    }
-
     await actualizar_capacidad();
-
-    console.log(`Cantidad personas: ${personas}, Horario: ${horario}`)
 }
 
 document.addEventListener("input", get_values);
@@ -110,7 +117,6 @@ async function actualizar_capacidad() {
         const element = document.getElementById(`espacio_${lugares[index].id}`);
         const lugar = lugares[index];
         element.innerHTML = `${lugar.nombre} - ${lugar.espacio_disponible}`;
-
     }
 }
 

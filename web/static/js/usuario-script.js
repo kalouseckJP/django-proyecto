@@ -1,3 +1,56 @@
+function limitar_horario_usuario() {
+    const input = document.getElementById("add-fecha");
+    let value = input.value;
+    const date = new Date();
+    const currentMinutes = date.getMinutes();
+    date.setMinutes(currentMinutes + 30);
+
+	let value2 = value[1].split(":");
+    let tiempo = parseInt(value2[0] * 60) + parseInt(value2[1]);
+    const comparacion = date.getHours() * 60 + date.getMinutes();
+	let test = date.getMinutes();
+	if(test.length < 2){
+		test = "0" + test;
+	}
+	input.min = `${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}T${date.getHours()}:${test}`;
+
+	if(value[0].split("-")[2] == date.getDate() && tiempo < comparacion) {
+        input.setCustomValidity("Su reserva debe ser realizada por lo menos 30 minutos en avance.");
+    } else {
+        input.setCustomValidity("");
+    }
+}
+
+document.addEventListener("input", limitar_horario_usuario)
+
+function fecha_30min(){
+	const date = new Date();
+    const currentMinutes = date.getMinutes();
+    date.setMinutes(currentMinutes + 30);
+	let test = date.getMinutes();
+	if(test.length < 2){
+		test = "0" + test;
+	}
+    min = `${date.getFullYear()}-0${date.getMonth()+1}-${date.getDate()}T${date.getHours()}:${test}`;
+	return min
+}
+
+function not_disp(input){
+    const date = new Date();
+    const currentMinutes = date.getMinutes();
+    date.setMinutes(currentMinutes + 30);
+
+    input = input.split("T");
+	let value2 = input[1].split(":");
+    let tiempo = parseInt(value2[0] * 60) + parseInt(value2[1]);
+	const comparacion = date.getHours() * 60 + date.getMinutes();
+
+	if(input[0].split("-")[2] == date.getDate() && tiempo < comparacion) {
+		const form = document.getElementById("edit-form")
+		alert("Solo puede modificar reservas con más de 30 minutos de antelación.");
+		document.getElementById("editModal").display = "none"
+    }
+}
 // #region Cambiar tabla
 function cambiarTabla() {
 	const buttons = document.querySelectorAll("nav button");
@@ -37,7 +90,6 @@ function editarElemento(event) {
 	const modalTitle = document.getElementById("modal-title");
 	const modalFields = document.getElementById("modal-fields");
 	const form = document.getElementById("edit-form");
-
 	editButtons.forEach((button) => {
 		button.addEventListener("click", () => {
 			const id = button.getAttribute("data-id");
@@ -54,7 +106,7 @@ function editarElemento(event) {
 						modalFields.innerHTML = `
                             <input type="hidden" name="id" value="${data.id}">
                             <label for="add-fecha">Fecha y Hora:</label>
-                            <input type="datetime-local" id="add-fecha" name="fecha_reserva" value="${data.now}" min="${data.now}" required>
+                            <input type="datetime-local" id="add-fecha" name="fecha_reserva" value="${fecha_30min()}" min="${fecha_30min()}" required>
                             <label for="edit-cantidad">Cantidad de Personas:</label>
                             <input type="number" id="edit-cantidad" name="cantidad_personas" value="${data.cantidad_personas}" min="1" required>
                             <label for="edit-lugar">Lugar:</label>
@@ -79,7 +131,9 @@ function editarElemento(event) {
 								console.error("Error fetching lugares:", error);
 							});
 
-						await actualizar_capacidad()
+						limitar_horario_usuario();
+						await actualizar_capacidad();
+						not_disp(data.fecha_reserva);
 					}
 					modal.style.display = "flex";
 				});
@@ -88,6 +142,7 @@ function editarElemento(event) {
 
 	window.closeModal = function () {
 		modal.style.display = "none";
+		document.querySelectorAll('input').forEach(input => input.disabled = false);
 	};
 
 	form.addEventListener("submit", (event) => {
@@ -209,6 +264,7 @@ function cerrarModalFuera(event) {
 
 	window.closeModal = function () {
 		editModal.style.display = "none";
+		document.querySelectorAll('input').forEach(input => input.disabled = false);
 	};
 }
 document.addEventListener("DOMContentLoaded", cerrarModalFuera);
@@ -219,8 +275,10 @@ function cerrarModalESC(event) {
 	if (event.key === "Escape") {
 		const editModal = document.getElementById("edit-modal");
 		if (editModal.style.display === "flex") {
+			document.querySelectorAll('input').forEach(input => input.disabled = false);
 			closeModal();
 		} else if (addModal.style.display === "flex") {
+			document.querySelectorAll('input').forEach(input => input.disabled = false);
 			closeAddModal();
 		}
 	}
@@ -300,41 +358,46 @@ function togglePassword(button) {
 	button.textContent = isHidden ? "Mostrar" : "Ocultar";
 }
 
+/**
+ * Recibe datos actualizados de los espacios
+ * @returns {data}
+ */
 async function get_cantidad() {
-    const editForm = document.getElementById("edit-form");
-    const formData = new FormData(editForm);
-    try {
-        const response = await fetch("/get_horarios_usuario/", {
-            method: "POST",
-            body: formData,
-        });
-        const data = await response.json();
+	const editForm = document.getElementById("edit-form");
+	const formData = new FormData(editForm);
+	try {
+		const response = await fetch("/get_horarios_usuario/", {
+			method: "POST",
+			body: formData,
+		});
+		const data = await response.json();
 
-        if (data.success) {
-            return data.lugares;
-        } else {
-            alert("Error al cargar");
-            console.log("Falló");
-            return null;
-        }
-    } catch (error) {
-        console.error("Fetch error:", error);
-        return null;
-    }
+		if (data.success) {
+			return data.lugares;
+		} else {
+			alert("Error al cargar");
+			console.log("Falló");
+			return null;
+		}
+	} catch (error) {
+		console.error("Fetch error:", error);
+		return null;
+	}
 }
 
 async function actualizar_capacidad() {
-    const lugares = await get_cantidad();
-    for (let index = 0; index < lugares.length; index++) {
-        const element = document.getElementById(`espacio_${lugares[index].id}`);
-        const lugar = lugares[index];
-        element.innerHTML = `${lugar.nombre} - ${lugar.espacio_disponible}`;
+	const lugares = await get_cantidad();
+	for (let index = 0; index < lugares.length; index++) {
+		const element = document.getElementById(`espacio_${lugares[index].id}`);
+		const lugar = lugares[index];
+		element.innerHTML = `${lugar.nombre} - ${lugar.espacio_disponible}`;
 
-    }
+	}
 }
 
 async function get_values() {
-    await actualizar_capacidad();
+	await actualizar_capacidad();
 }
 
 document.addEventListener("input", get_values);
+

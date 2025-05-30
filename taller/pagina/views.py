@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from datetime import datetime, date, timedelta
-from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable
+from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
@@ -23,11 +23,10 @@ def admin(request):
     clientes = Cliente.objects.all()
     lugares = Espacios.objects.all()
     mesas = Mesas.objects.all()
+    productos = Product.objects.all()
     
     today = date.today().isoformat() # AAAA-MM-DD
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
-    
-    print(reservas)
     return render(request, 'admin.html', {
         'reservas': reservas,
         'clientes': clientes,
@@ -35,6 +34,7 @@ def admin(request):
         'tiempo': tiemponow,
         'today': today,
         'mesas': mesas,
+        'productos': productos,
     })
 
 def front(request):
@@ -44,25 +44,16 @@ def front(request):
 
 def hacer_reserva(request):
     today = date.today().isoformat() # AAAA-MM-DD
-    now = datetime.now().strftime('%H:%M') # HH:MM
+    now = (datetime.now() + timedelta(minutes=30)).strftime('%H:%M')
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
     lugares = Espacios.objects.all()
-    reservas = Reserva.objects.all()
     cliente = Cliente.objects.get(RUT = request.COOKIES.get("user_id"))
     rango = range(1,11)
-    for lugar in lugares:
-        # Sumar la cantidad de personas en reservas dentro del rango de tiempo
-        reservas_en_rango = reservas.filter(
-            espacio=lugar,
-        ).aggregate(total_personas=Sum('cantidad_personas'))['total_personas'] or 0
-        # Calcular capacidad actual
-        capacidad_actual = lugar.capacidadMaxima - reservas_en_rango
         
     return render(request, 'reservaciones.html', 
                   {'today': today, 
                    'now': now, 
                    'lugares': lugares, 
-                   'capacidad_actual': capacidad_actual,
                    'tiemponow': tiemponow, 
                    'rango': rango, 
                    "cliente": cliente})
@@ -147,7 +138,12 @@ def edit_reserva(request):
         reserva.cantidad_personas = request.POST.get("cantidad_personas")
         reserva.espacio = lugar
         reserva.save()
-        assign_tables_to_reservation(reserva)
+        try:
+            assign_tables_to_reservation(reserva)
+        except Exception as e:
+            print(e)
+            return JsonResponse({"success": False, "id": reserva.id, "RUT": reserva.RUT.RUT, "nombre": reserva.RUT.nombre, "apellido": reserva.RUT.apellido, "telefono": reserva.RUT.telefono, "email": reserva.RUT.email, "fecha_reserva": naive_datetime, "hora_inicio": reserva.hora_inicio, "cantidad_personas": reserva.cantidad_personas, "espacio": reserva.espacio.nombre})
+
         return JsonResponse({"success": True, "id": reserva.id, "RUT": reserva.RUT.RUT, "nombre": reserva.RUT.nombre, "apellido": reserva.RUT.apellido, "telefono": reserva.RUT.telefono, "email": reserva.RUT.email, "fecha_reserva": naive_datetime, "hora_inicio": reserva.hora_inicio, "cantidad_personas": reserva.cantidad_personas, "espacio": reserva.espacio.nombre})
     return JsonResponse({"success": False})
 
@@ -225,7 +221,13 @@ def add_reserva(request):
         )
         cliente.visitas = cliente.visitas+1
         cliente.save()
-        assign_tables_to_reservation(reserva)
+        try:
+            assign_tables_to_reservation(reserva)
+        except Exception as e:
+            reserva.delete()
+            cliente.visitas = cliente.visitas - 1
+            print(e)
+            return JsonResponse({'success': False, 'error':True})
         new_row_html = render_to_string("partials/reserva_row.html", {"reserva": reserva})
         return JsonResponse({"success": True, "new_row_html": new_row_html})
     return JsonResponse({"success": False})
@@ -272,21 +274,37 @@ def get_all_lugares(request):
 
 def add_reserva_cliente(request):
     if request.method == "POST":
+        fecha = request.POST["fecha"]
+        hora = request.POST["hora"]
+        datetime_str = f"{fecha} {hora}"
+        cliente = Cliente.objects.get(RUT = request.COOKIES.get("user_id"))
+        fecha_reserva = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M")
         reserva = Reserva.objects.create(
-            RUT = Cliente.objects.get(RUT = request.COOKIES.get("user_id")),
+            RUT = cliente,
             espacio = Espacios.objects.get(id = request.POST["lugar"]),
-            fecha_reserva = request.POST["fecha"],
+            fecha_reserva = fecha_reserva,
             hora_inicio = request.POST["hora"],
             cantidad_personas = request.POST["cantidad_personas"]
         )
-        assign_tables_to_reservation(reserva)
+        try:
+            assign_tables_to_reservation2(reserva, get_h_mesas(request))
+        except Exception as e:
+            import traceback
+            traceback.print_exc()  # Logs full stack trace
+            reserva.delete()
+            cliente.visitas = cliente.visitas - 1
+            cliente.save()
+            reserva.delete()
+            cliente.visitas = cliente.visitas - 1
+            cliente.save()
+            print(e)
+            return JsonResponse({'success': False, 'error':True})
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
 def get_horarios(request):
     if request.method == "POST":
         espacios = Espacios.objects.all()
-        reservas = Reserva.objects.all()
         fecha = request.POST["fecha"]
         hora = request.POST["hora"]
         
@@ -374,9 +392,6 @@ def validacion_cliente(request):
 def usuario(request):
     RUT = Cliente.objects.get(RUT = request.COOKIES.get('user_id'))
     now_local = timezone.localtime(timezone.now())-timedelta(hours=4)
-
-    print(timezone.now())
-    print(now_local)
     reservas = Reserva.objects.filter(RUT = RUT, fecha_reserva__gte=now_local)
     if not reservas:
         response = render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT, 'vacio': True})
@@ -386,10 +401,10 @@ def usuario(request):
 
 def get_horarios_usuario(request):
     if request.method == "POST":
-        espacios = Espacios.objects.all()
         fecha_reserva = request.POST["fecha_reserva"]
         naive_datetime = datetime.fromisoformat(fecha_reserva)
         aware_datetime = make_aware(naive_datetime)
+        print(aware_datetime)
         
         start_range = aware_datetime - timedelta(minutes=30)
         end_range = aware_datetime + timedelta(minutes=30)
@@ -410,13 +425,13 @@ def get_horarios_usuario(request):
                 upd_lugar.capacidad_actual = lugares_test.available_spots
                 upd_lugar.save()
             print(lugares_test.available_spots)
-        
+
         
         data = [{
             'id': ele.id,
             'nombre': ele.nombre,
             'descripcion': ele.descripcion,
-            'capacidadMaxima': ele. capacidadMaxima,
+            'capacidadMaxima': ele.capacidadMaxima,
             'capacidad_actual': ele.capacidad_actual,
             'reservas_actuales': ele.overlapping_reservas,
             'espacio_disponible': ele.available_spots
@@ -444,16 +459,19 @@ def get_reserva_mesa(request, reservaRequest, mesa):
     return JsonResponse(data)
 
 def assign_tables_to_reservation(reservation):
-    print(reservation.cantidad_personas)
     necesarias = int(reservation.cantidad_personas)
     mesas = Mesas.objects.filter(cantidadActual__gt=0).order_by('-capacidadMesa')
     asientos_totales_asignados = 0
-
     for mesa in mesas:
+        dummy = mesa.cantidadActual
         personas_restantes = necesarias - asientos_totales_asignados
         if personas_restantes <= 0:
             break
-
+        if personas_restantes > (dummy*mesa.capacidadMesa - asientos_totales_asignados):
+            continue
+        else:
+            dummy = dummy - 1
+            
         # Cantidad máxima que se podría usar de este tipo
         cantidad_usar = min(mesa.cantidadActual, (personas_restantes + mesa.capacidadMesa - 1) // mesa.capacidadMesa)
 
@@ -462,18 +480,52 @@ def assign_tables_to_reservation(reservation):
             cantidad_usar -= 1
 
         if cantidad_usar > 0:
-            ReservationTable.objects.create(
+            reservationTable = ReservationTable.objects.create(
                 reservacion=reservation,
                 mesa=mesa,
                 cantidadUsada=cantidad_usar
             )
-            mesa.cantidadActual -= cantidad_usar
-            mesa.save()
-
             asientos_totales_asignados += cantidad_usar * mesa.capacidadMesa
 
     if asientos_totales_asignados < necesarias:
         raise Exception("No hay suficientes mesas para satisfacer la reservación.")
+    
+def assign_tables_to_reservation2(reservation, mesat):
+    necesarias = int(reservation.cantidad_personas)
+    mesas = mesat
+    print("aqui mkesas")
+    asientos_totales_asignados = 0
+    for mesa in mesas:
+        print(mesa)
+        dummy = mesa["cantidadActual"]
+        print("dummy = mesacantidadActual")
+        print(mesa["cantidadActual"])
+        personas_restantes = necesarias - asientos_totales_asignados
+        if personas_restantes <= 0:
+            break
+        if personas_restantes > (dummy*int(mesa["capacidadMesa"]) - asientos_totales_asignados):
+            continue
+        else:
+            dummy = dummy - 1
+            
+        # Cantidad máxima que se podría usar de este tipo
+        cantidad_usar = min(mesa["cantidadActual"], (personas_restantes + mesa["capacidadMesa"] - 1) // mesa["capacidadMesa"])
+
+        # Reducir la cantidad si estamos sobrellenando demasiado (ej: 2 mesas de 6 para 8 personas = 12 asientos)
+        while cantidad_usar > 0 and (cantidad_usar - 1) * mesa["cantidadActual"] >= personas_restantes:
+            cantidad_usar -= 1
+
+        if cantidad_usar > 0:
+            reservationTable = ReservationTable.objects.create(
+                reservacion=reservation,
+                mesa=Mesas.objects.get(id = mesa["id"]),
+                cantidadUsada=cantidad_usar
+            )
+            asientos_totales_asignados += cantidad_usar * mesa["capacidadMesa"]
+
+    if asientos_totales_asignados < necesarias:
+        raise Exception("No hay suficientes mesas para satisfacer la reservación.")
+
 
 def delete_reserva_mesas(reserva):
     print('llega aqui?')
@@ -484,4 +536,180 @@ def delete_reserva_mesas(reserva):
         mesa.cantidadActual = mesa.cantidadActual + mesas.cantidadUsada
         mesa.save()
     reserva_mesa.delete()
+
+def get_mesas(request, id):
+    mesas = Mesas.objects.get(id=id)
+    data = {
+        "id": mesas.id,
+        "capacidad_mesa": mesas.capacidadMesa,
+        "tamano_mesa": mesas.tamanoMesa,
+        "cantidad_mesas": mesas.cantidadMesas,
+        "cantidad_actual": mesas.cantidadActual
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def edit_mesas(request):
+    if request.method == "POST":
+        id = request.POST.get("id")
+        mesas = Mesas.objects.get(id=id)
+        mesas.capacidadMesa = request.POST.get("capacidad_mesa")
+        mesas.tamanoMesa =  request.POST.get("tamano_mesa")
+        mesas.cantidadMesas = request.POST.get("cantidad_mesas")
+        mesas.cantidadActual = request.POST.get("cantidad-actual")
+        mesas.save()
+        return JsonResponse({"success": True,
+                             "id": id,
+                             "capacidad_mesa": mesas.capacidadMesa,
+                             "tamano_mesa": mesas.tamanoMesa,
+                             "cantidad_mesas": mesas.cantidadMesas,
+                             "cantidad_actual": mesas.cantidadActual
+                             })
+    return JsonResponse({"success": False})
+
+def get_h_mesas_admin(request):
+    provided_datetime = timezone.now() - timedelta(hours=4)
+
+    start = provided_datetime - timedelta(minutes=30)
+    end = provided_datetime + timedelta(minutes=30)
+
+    mesas_data = []
     
+    # Loop through all mesas to recalculate availability
+    for mesa in Mesas.objects.all():
+        # Sum all used quantities for this mesa in overlapping reservations
+        overlapping_usage = ReservationTable.objects.filter(
+            mesa=mesa,
+            reservacion__fecha_reserva__range=(start, end)  # adjust to your Reserva datetime field name
+        ).aggregate(total_used=Sum('cantidadUsada'))['total_used'] or 0
+        mesa.cantidadActual = int(mesa.cantidadMesas) - overlapping_usage
+        print(mesa.cantidadActual)
+        mesa.save()
+
+        mesas_data.append({
+            'id': mesa.id,
+            'capacidad': mesa.capacidadMesa,
+            'cantidadMesas': mesa.cantidadMesas,
+            'cantidadActual': mesa.cantidadActual,
+        })
+        print(mesas_data)
+
+    return JsonResponse({'success': True, 'lugares': mesas_data})
+
+def get_h_mesas(request):
+    datetime_str = request.POST.get('fecha')  # input name from form
+    hora = request.POST["hora"]
+    datetime_str = f"{datetime_str} {hora}"
+    
+    if not datetime_str:
+        return JsonResponse({'success': False, 'error': 'Missing datetime'}, status=400)
+
+    try:
+        provided_datetime = datetime.fromisoformat(datetime_str)
+    except ValueError:
+        return JsonResponse({'success': False, 'error': 'Invalid datetime format'}, status=400)
+
+    start = provided_datetime - timedelta(minutes=30)
+    end = provided_datetime + timedelta(minutes=30)
+
+    mesas_data = []
+    
+    # Loop through all mesas to recalculate availability
+    for mesa in Mesas.objects.all():
+        # Sum all used quantities for this mesa in overlapping reservations
+        overlapping_usage = ReservationTable.objects.filter(
+            mesa=mesa,
+            reservacion__fecha_reserva__range=(start, end)  # adjust to your Reserva datetime field name
+        ).aggregate(total_used=Sum('cantidadUsada'))['total_used'] or 0
+        
+        mesas_data.append({
+            'id': mesa.id,
+            'capacidadMesa': mesa.capacidadMesa,
+            'cantidadMesas': mesa.cantidadMesas,
+            'cantidadActual': mesa.cantidadMesas - overlapping_usage,
+        })
+
+    return mesas_data
+
+def add_mesas(request):
+    if request.method == "POST":
+        mesa = Mesas.objects.create(
+            capacidadMesa = request.POST["capacidad-mesa"],
+            tamanoMesa = request.POST["tamano-mesa"],
+            cantidadMesas = request.POST["cantidad-mesas"],
+            cantidadActual = request.POST["cantidad-actual"],
+        )
+        new_row_html = render_to_string("partials/mesas_row.html", {"mesa": mesa})
+        return JsonResponse({"success": True, "new_row_html": new_row_html})
+    return JsonResponse({"success": False})
+
+@csrf_exempt
+def delete_mesas(request, id):
+    if request.method == "DELETE":
+        try:
+            mesa = Mesas.objects.get(id=id)
+            mesa.delete()
+            return JsonResponse({"success": True})
+        except Cliente.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Cliente no encontrado"})
+    return JsonResponse({"success": False, "error": "Método no permitido"})
+
+def product_list(request):
+    offset = int(request.GET.get('offset', 0))
+    limit = int(request.GET.get('limit', 10))
+    products = Product.objects.all()[offset:offset + limit]
+
+    data = [{
+        'id': p.id,
+        'name': p.name,
+        'description': p.description,
+        'price': str(p.price),
+        'image_url': p.image
+    } for p in products]
+
+    return JsonResponse({'products': data})
+
+def get_productos(request, id):
+    producto = Product.objects.get(id=id)
+    data = {
+        "id": producto.id,
+        "name": producto.name,
+        "description": producto.description,
+        "price": str(producto.price),
+        "image": producto.image
+    }
+    return JsonResponse(data)
+
+def add_productos(request):
+    if request.method == 'POST':
+        product = Product.objects.create(
+            name=request.POST['name'],
+            description=request.POST['description'],
+            price=request.POST['price'],
+            image=request.POST['image']
+        )
+        new_row_html = render_to_string("partials/producto_row.html", {"producto": product})
+        return JsonResponse({"success": True, "new_row_html": new_row_html})
+    
+@csrf_exempt
+def edit_productos(request):
+    if request.method == 'POST':
+        id = request.POST["id"]
+        product = Product.objects.get(id = id)
+        product.name = request.POST['name']
+        product.description = request.POST['description']
+        product.price = request.POST['price']
+        product.image_url = request.POST['image_url']
+        product.save()
+        return JsonResponse({'status': 'updated'})
+    
+@csrf_exempt
+def delete_productos(request, id):
+    if request.method == 'DELETE':
+        try:
+            product = Product.objects.get(id = id)
+            product.delete()
+            return JsonResponse({'success': True})
+        except Product.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Producto no encontrado"})
+    return JsonResponse({"success": False, "error": "Método no permitido"})

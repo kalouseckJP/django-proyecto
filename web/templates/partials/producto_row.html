@@ -1,0 +1,15 @@
+<tr>
+    <td>{{ p.id }}</td>
+    <td>{{ p.name }}</td>
+    <td>{{ p.description }}</td>
+    <td>{{ p.price }}</td>
+    <td>{{ p.image }}</td>
+    <td class="tabla-elem-final">
+        <button type="button" class="edit-button" data-id="{{ p.id }}" data-type="productos">
+            <i class="bi bi-pencil-square"></i> Editar
+        </button>
+        <button type="button" class="delete-button" data-id="{{ p.id }}" data-type="productos">
+            <i class="bi bi-trash"></i> Eliminar
+        </button>
+    </td>
+</tr>

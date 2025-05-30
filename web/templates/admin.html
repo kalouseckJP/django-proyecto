@@ -39,6 +39,9 @@
                     <li>
                         <button type="button" value="Reportes">Reportes</button>
                     </li>
+                    <li>
+                        <button type="button" value="Menu">Menú</button>
+                    </li>
                 </ul>
             </nav>
             <div class="admin-content">
@@ -190,8 +193,8 @@
             </div>
             <div id="mesas-content" class="admin-content tablas">
                 <div id="admin-content-header">
-                    <h3>Tablas</h3>
-                    <button type="button" id="add" data-type="lugar">
+                    <h3>Mesas</h3>
+                    <button type="button" id="add" data-type="mesas">
                         <i class="bi bi-plus-circle"></i> Agregar
                     </button>
                 </div>
@@ -216,10 +219,10 @@
                                     <td>{{ mesa.cantidadMesas }}</td>
                                     <td>{{ mesa.cantidadActual }}</td>
                                     <td class="tabla-elem-final">
-                                        <button type="button" class="edit-button" data-id="{{ reserva.id }}" data-type="reserva">
+                                        <button type="button" class="edit-button" data-id="{{ mesa.id }}" data-type="mesas">
                                             <i class="bi bi-pencil-square"></i> Editar
                                         </button>
-                                        <button type="button" class="delete-button" data-id="{{ reserva.id }}" data-type="reserva">
+                                        <button type="button" class="delete-button" data-id="{{ mesa.id }}" data-type="mesas">
                                             <i class="bi bi-trash"></i> Eliminar
                                         </button>
                                     </td>
@@ -229,6 +232,47 @@
                     </table>
                 </div>
 
+            </div>
+            <div id="menu-content" class="admin-content tablas">
+                <div id="admin-content-header">
+                    <h3>Menú</h3>
+                    <button type="button" id="add" data-type="productos">
+                        <i class="bi bi-plus-circle"></i> Agregar
+                    </button>
+                </div>
+                <div class="reservas" id="admin-content-titles">
+                    <table class="reservas-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                                <th>Imagen</th>
+                                <th class="tabla-elem-final"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="reservas-body">
+                            {% for p in productos %}
+                                <tr>
+                                    <td>{{ p.id }}</td>
+                                    <td>{{ p.name }}</td>
+                                    <td>{{ p.description }}</td>
+                                    <td>{{ p.price }}</td>
+                                    <td>{{ p.image }}</td>
+                                    <td class="tabla-elem-final">
+                                        <button type="button" class="edit-button" data-id="{{ p.id }}" data-type="productos">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+                                        <button type="button" class="delete-button" data-id="{{ p.id }}" data-type="productos">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <input id="admin-salida" type="submit" value="Salir" onclick="window.location.href='{% url "index" %}'">

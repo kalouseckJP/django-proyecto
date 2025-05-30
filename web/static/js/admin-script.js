@@ -21,7 +21,7 @@ function cambiarTabla() {
     const adminContent = document.getElementsByClassName("admin-content")[0];
 
     buttons.forEach(button => {
-        button.addEventListener("click", function () {
+        button.addEventListener("click", async function () {
             const value = this.value;
             let content = "";
             test = "";
@@ -29,29 +29,32 @@ function cambiarTabla() {
             switch (value) {
                 case "Productos":
                     adminContent.style.display = "none";
+                    document.getElementById("reserva-content").style.display = "block";
                     document.getElementById("lugar-content").style.display = "none";
                     document.getElementById("cliente-content").style.display = "none";
                     document.getElementById("reporte-content").style.display = "none";
-                    document.getElementById("reserva-content").style.display = "block";
                     document.getElementById("mesas-content").style.display = "none";
+                    document.getElementById("menu-content").style.display = "none";
                     // content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
                     break;
                 case "Clientes":
                     adminContent.style.display = "none";
                     document.getElementById("reserva-content").style.display = "none";
+                    document.getElementById("cliente-content").style.display = "block";
                     document.getElementById("lugar-content").style.display = "none";
                     document.getElementById("reporte-content").style.display = "none";
-                    document.getElementById("cliente-content").style.display = "block";
                     document.getElementById("mesas-content").style.display = "none";
+                    document.getElementById("menu-content").style.display = "none";
                     // content = "<div id='admin-content-header'><h3>Gestion de Clientes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los clientes.</p>";
                     break;
                 case "Lugares":
                     adminContent.style.display = "none";
                     document.getElementById("reserva-content").style.display = "none";
                     document.getElementById("cliente-content").style.display = "none";
-                    document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("lugar-content").style.display = "block";
+                    document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("mesas-content").style.display = "none";
+                    document.getElementById("menu-content").style.display = "none";
                     // content = "<div id='admin-content-header'><h3>Gestion de Ventas</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los ventas.</p>";
                     break;
                 case "Reportes":
@@ -61,15 +64,28 @@ function cambiarTabla() {
                     document.getElementById("lugar-content").style.display = "none";
                     document.getElementById("reporte-content").style.display = "block";
                     document.getElementById("mesas-content").style.display = "none";
+                    document.getElementById("menu-content").style.display = "none";
                     // content = "<div id='admin-content-header'><h3>Gestion de Reportes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los reportes.</p>";
                     break;
                 case "Mesas":
+                    await get_cantidad_mesas();
                     adminContent.style.display = "none";
                     document.getElementById("reserva-content").style.display = "none";
                     document.getElementById("cliente-content").style.display = "none";
                     document.getElementById("lugar-content").style.display = "none";
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("mesas-content").style.display = "block";
+                    document.getElementById("menu-content").style.display = "none";
+                    break;
+                case "Menu":
+                    adminContent.style.display = "none";
+                    document.getElementById("reserva-content").style.display = "none";
+                    document.getElementById("cliente-content").style.display = "none";
+                    document.getElementById("lugar-content").style.display = "none";
+                    document.getElementById("reporte-content").style.display = "none";
+                    document.getElementById("mesas-content").style.display = "none";
+                    document.getElementById("menu-content").style.display = "block";
+                    break;
 
                 default:
                     content = "<h3>Contenido de Administración</h3><p>Aquí van gestionar los productos, clientes y ventas.</p>";
@@ -104,9 +120,9 @@ function editarElemento(event) {
                         modalFields.innerHTML = `
                             <input type="hidden" name="id" value="${data.id}">
                             <label for="edit-rut">RUT:</label>
-                            <input type="text" id="edit-rut" name="RUT" value="${data.RUT}" required>
+                            <input type="text" id="edit-rut" name="RUT" value="${data.RUT}" required disabled>
                             <label for="add-fecha">Fecha y Hora:</label>
-                            <input type="datetime-local" id="add-fecha" name="fecha_reserva" value="${data.now}" min="${data.now}" required>
+                            <input type="datetime-local" id="add-fecha" name="fecha_reserva" value="${data.now}" min="${data.now}" required autofocus>
                             <label for="edit-cantidad">Cantidad de Personas:</label>
                             <input type="number" id="edit-cantidad" name="cantidad_personas" value="${data.cantidad_personas}" min="1" required>
                             <label for="edit-lugar">Lugar:</label>
@@ -153,6 +169,30 @@ function editarElemento(event) {
                             <label for="edit-descripcion">Descripción:</label>
                             <textarea id="edit-descripcion" name="descripcion" required>${data.descripcion}</textarea>
                         `;
+                    } else if (type === "mesas") {
+                        modalFields.innerHTML = `
+                            <input type="hidden" name="id" value="${data.id}">
+                            <label for="edit-capacidad">Capacidad Mesa:</label>
+                            <input type="number" id="edit-capacidad" name="capacidad_mesa" value="${data.capacidad_mesa}" required autofocus>
+                            <label for="edit-capacidad-maxima">Tamaño Mesa:</label>
+                            <input type="number" id="edit-capacidad-maxima" name="tamano_mesa" value="${data.tamano_mesa}" min="1" max="4" required>
+                            <label for="edit-cantidad-mesas">Cantidad Mesas:</label>
+                            <input type="number" id="edit-cantidad-mesas" name="cantidad_mesas" value="${data.cantidad_mesas}" min="0" required>
+                            <label for="edit-cantidad-actual">Cantidad Actual:</label>
+                            <input type="number" id="edit-cantidad-actual" name="cantidad-actual" value="${data.cantidad_actual}" min="0" required>
+                        `;
+                    } else if(type === "productos") {
+                        modalFields.innerHTML = `
+                            <input type="hidden" name="id" value="${data.id}">
+                            <label for="edit-nombre">Nombre:</label>
+                            <input type="text" id="edit-nombre" name="name" value="${data.name}" required>
+                            <label for="edit-precio">Precio:</label>
+                            <input type="number" id="edit-capacidad" name="price" value="${data.price}" required>
+                            <label for="edit-descripcion">Descripción:</label>
+                            <textarea id="edit-descripcion" name="description" required>${data.description}</textarea>
+                            <label for="edit-descripcion">URL:</label>
+                            <input type="url" id="edit-capacidad" name="image" value="${data.image}" required>
+                        `;
                     }
 
                     modal.style.display = "flex";
@@ -168,7 +208,6 @@ function editarElemento(event) {
         event.preventDefault();
         const formData = new FormData(form);
         const type = modalTitle.textContent.split(" ")[1].toLowerCase();
-
         fetch(`/edit_${type}/`, {
             method: "POST",
             body: formData,
@@ -203,6 +242,11 @@ function editarElemento(event) {
                         row.querySelector("td:nth-child(2)").textContent = data.nombre || "N/A";
                         row.querySelector("td:nth-child(3)").textContent = data.capacidadMaxima || "N/A";
                         row.querySelector("td:nth-child(5)").textContent = data.descripcion || "N/A";
+                    } else if (type === "mesas") {
+                        row.querySelector("td:nth-child(2)").textContent = data.tamano_mesa || "N/A";
+                        row.querySelector("td:nth-child(3)").textContent = data.capacidad_mesa || "N/A";
+                        row.querySelector("td:nth-child(4)").textContent = data.cantidad_mesas || "N/A";
+                        row.querySelector("td:nth-child(5)").textContent = data.cantidad_actual || "N/A";
                     }
 
                     closeModal();
@@ -217,7 +261,7 @@ function editarElemento(event) {
     });
 }
 
-document.addEventListener("click", editarElemento);
+document.addEventListener("DOMContentLoaded", editarElemento);
 // #endregion
 
 // #region Eliminar un elemento de la tabla
@@ -257,7 +301,7 @@ function eliminarElemento(event) {
     });
 }
 
-document.addEventListener("click", eliminarElemento);
+document.addEventListener("DOMContentLoaded", eliminarElemento);
 // #endregion
 
 // #region Añadir un nuevo elemento a la tabla
@@ -327,6 +371,28 @@ function añadirElemento(event) {
                     <input type="number" id="add-capacidad" name="capacidadMaxima" required>
                     <label for="add-descripcion">Descripción:</label>
                     <textarea id="add-descripcion" name="descripcion" required></textarea>
+                `;
+            } else if (type === "mesas") {
+                addModalFields.innerHTML = `
+                    <label for="edit-capacidad">Capacidad Mesa:</label>
+                    <input type="number" id="edit-capacidad" name="capacidad-mesa" value="2" required autofocus>
+                    <label for="edit-capacidad-maxima">Tamaño Mesa:</label>
+                    <input type="number" id="edit-capacidad-maxima" name="tamano-mesa" value="1" min="1" max="4" required>
+                    <label for="edit-cantidad-mesas">Cantidad Mesas:</label>
+                    <input type="number" id="edit-cantidad-mesas" name="cantidad-mesas" value="10" min="0" required>
+                    <label for="edit-cantidad-actual">Cantidad Actual:</label>
+                    <input type="number" id="edit-cantidad-actual" name="cantidad-actual" value="10" min="0" required>
+                `;
+            } else if(type === "productos") {
+                addModalFields.innerHTML = `
+                    <label for="edit-nombre">Nombre:</label>
+                    <input type="text" id="edit-nombre" name="name" required>
+                    <label for="edit-precio">Precio:</label>
+                    <input type="number" id="edit-capacidad" name="price" min="500" value="500" required>
+                    <label for="edit-descripcion">Descripción:</label>
+                    <textarea id="edit-descripcion" name="description" required></textarea>
+                    <label for="edit-descripcion">URL:</label>
+                    <input type="url" id="edit-capacidad" name="image" required>
                 `;
             }
 
@@ -415,3 +481,22 @@ function cerrarModalESC(event) {
 }
 document.addEventListener("keydown", cerrarModalESC);
 // #endregion
+
+async function get_cantidad_mesas() {
+	const editForm = document.getElementById("edit-form");
+	const formData = new FormData(editForm);
+	try {
+		const response = await fetch("/get_h_mesas_admin/", {
+			method: "POST",
+			body: formData,
+		});
+		const data = await response.json();
+
+		if (!data.success) {
+			alert("Error al cargar");
+			console.log("Falló");
+		} 
+	} catch (error) {
+		console.error("Fetch error:", error);
+	}
+}

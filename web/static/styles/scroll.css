@@ -1,0 +1,38 @@
+#product-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding: 20px;
+}
+
+.product {
+    flex: 0 0 auto;
+    width: 200px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    background: #fff;
+    text-align: center;
+}
+
+.product img {
+    width: 100%;
+    height: auto;
+}
+
+.description.small {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.price {
+    font-weight: bold;
+    margin-top: 5px;
+    color: green;
+}
+
+#loading {
+    min-width: 200px;
+    padding: 20px;
+    text-align: center;
+}

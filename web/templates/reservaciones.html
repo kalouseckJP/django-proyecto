@@ -36,7 +36,7 @@
             <form action="" method="post" name="reservacionForm" id="reservacionForm">
                 {% csrf_token %}
                 <label for="fecha">Fecha *</label>
-                <input type="date" id="fecha" name="fecha" min="{{ today }}" value="{{ today }}"required>
+                <input type="date" id="fecha" name="fecha" min="{{ today }}" value="{{ today }}" required>
                 <br>
 
                 <label for="hora">Hora *</label>
