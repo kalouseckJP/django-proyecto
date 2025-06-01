@@ -41,7 +41,11 @@ function limitar_horario() {
     const date = new Date();
     const currentMinutes = date.getMinutes();
     date.setMinutes(currentMinutes + 30);
-    inputHora.min = `${date.getHours()}:${date.getMinutes()}`;
+    let test = date.getHours().toString()
+    if(test.length < 2){
+        test = "0" + test
+    }
+    inputHora.min = `${test}:${date.getMinutes()}`;
     
     value = value.split(":");
     let tiempo = parseInt(value[0] * 60) + parseInt(value[1]);
@@ -52,7 +56,6 @@ function limitar_horario() {
         inputHora.setCustomValidity("Su reserva debe ser realizada por lo menos 30 minutos en avance.")
     } else {
         inputHora.setCustomValidity("")
-
     }
 }
 

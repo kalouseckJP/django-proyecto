@@ -292,13 +292,10 @@ def add_reserva_cliente(request):
             import traceback
             traceback.print_exc()  # Logs full stack trace
             reserva.delete()
-            cliente.visitas = cliente.visitas - 1
-            cliente.save()
-            reserva.delete()
-            cliente.visitas = cliente.visitas - 1
             cliente.save()
             print(e)
             return JsonResponse({'success': False, 'error':True})
+        cliente.visitas = cliente.visitas + 1
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
@@ -699,9 +696,9 @@ def edit_productos(request):
         product.name = request.POST['name']
         product.description = request.POST['description']
         product.price = request.POST['price']
-        product.image_url = request.POST['image_url']
+        product.image = request.POST['image']
         product.save()
-        return JsonResponse({'status': 'updated'})
+        return JsonResponse({"success": True})
     
 @csrf_exempt
 def delete_productos(request, id):

@@ -8,7 +8,7 @@ function limitar_horario_usuario() {
 	let value2 = value[1].split(":");
     let tiempo = parseInt(value2[0] * 60) + parseInt(value2[1]);
     const comparacion = date.getHours() * 60 + date.getMinutes();
-	let test = date.getMinutes();
+	let test = date.getMinutes().toString();
 	if(test.length < 2){
 		test = "0" + test;
 	}
@@ -27,7 +27,7 @@ function fecha_30min(){
 	const date = new Date();
     const currentMinutes = date.getMinutes();
     date.setMinutes(currentMinutes + 30);
-	let test = date.getMinutes();
+	let test = date.getMinutes().toString();
 	if(test.length < 2){
 		test = "0" + test;
 	}
