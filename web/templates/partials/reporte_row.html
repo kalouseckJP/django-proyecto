@@ -1,0 +1,15 @@
+<tr>
+    <td>{{ reporte.id }}</td>
+    <td>{{ reporte.tipo }}</td>
+    <td>{{ reporte.rango_inicio }}</td>
+    <td>{{ reporte.rango_final }}</td>
+    <td>{{ reporte.clientes }}</td>
+    <td class="tabla-elem-final">
+        <button type="button" class="edit-button" data-id="{{ lugar.id }}" data-type="lugar">
+            <i class="bi bi-pencil-square"></i> Editar
+        </button>
+        <button type="button" class="delete-button" data-id="{{ lugar.id }}" data-type="lugar">
+            <i class="bi bi-trash"></i> Eliminar
+        </button>
+    </td>
+</tr>

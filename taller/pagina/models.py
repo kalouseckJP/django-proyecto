@@ -81,3 +81,14 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.URLField()
+    def __str__(self):
+        return f"{self.name} - Valor: {self.price}"
+    
+class Reportes(models.Model):
+    id = models.AutoField(primary_key=True)
+    tipo = models.CharField()
+    rango_inicio = models.DateField()
+    rango_final = models.DateField()
+    clientes = models.PositiveIntegerField()
+    def __str__(self):
+        return f"{self.id} - {self.rango_inicio} - {self.rango_final} - Cliente: {self.clientes}"

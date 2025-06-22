@@ -181,7 +181,7 @@ function editarElemento(event) {
                             <label for="edit-cantidad-actual">Cantidad Actual:</label>
                             <input type="number" id="edit-cantidad-actual" name="cantidad-actual" value="${data.cantidad_actual}" min="0" required>
                         `;
-                    } else if(type === "productos") {
+                    } else if (type === "productos") {
                         modalFields.innerHTML = `
                             <input type="hidden" name="id" value="${data.id}">
                             <label for="edit-nombre">Nombre:</label>
@@ -193,6 +193,17 @@ function editarElemento(event) {
                             <label for="edit-descripcion">URL:</label>
                             <input type="url" id="edit-capacidad" name="image" value="${data.image}" required>
                         `;
+                    } else if (type === "reporte") {
+                        modalFields.innerHTML = `
+                            <input type="hidden" name="id" value="${data.id}">
+                            <label for="edit-tipo">Tipo:</label>
+                            <select id="edit-tipo" name="tipo">
+                                <option value="Mensual">Mensual</option>
+                                <option value="Semanal">Semanal</option>
+                            </select>
+                            <label for="edit-fecha">
+                            <input type="date" id="edit-fecha" name="fecha" value="${data.rango_inicio}">
+                        `
                     }
 
                     modal.style.display = "flex";
@@ -247,6 +258,11 @@ function editarElemento(event) {
                         row.querySelector("td:nth-child(3)").textContent = data.capacidad_mesa || "N/A";
                         row.querySelector("td:nth-child(4)").textContent = data.cantidad_mesas || "N/A";
                         row.querySelector("td:nth-child(5)").textContent = data.cantidad_actual || "N/A";
+                    } else if (type === "reporte") {
+                        row.querySelector("td:nth-child(2)").textContent = data.tipo|| "N/A";
+                        row.querySelector("td:nth-child(3)").textContent = data.rango_inicio || "N/A";
+                        row.querySelector("td:nth-child(4)").textContent = data.rango_final || "N/A";
+                        row.querySelector("td:nth-child(5)").textContent = data.clientes || "N/A";
                     }
 
                     closeModal();
@@ -374,26 +390,36 @@ function añadirElemento(event) {
                 `;
             } else if (type === "mesas") {
                 addModalFields.innerHTML = `
-                    <label for="edit-capacidad">Capacidad Mesa:</label>
-                    <input type="number" id="edit-capacidad" name="capacidad-mesa" value="2" required autofocus>
-                    <label for="edit-capacidad-maxima">Tamaño Mesa:</label>
-                    <input type="number" id="edit-capacidad-maxima" name="tamano-mesa" value="1" min="1" max="4" required>
-                    <label for="edit-cantidad-mesas">Cantidad Mesas:</label>
-                    <input type="number" id="edit-cantidad-mesas" name="cantidad-mesas" value="10" min="0" required>
-                    <label for="edit-cantidad-actual">Cantidad Actual:</label>
-                    <input type="number" id="edit-cantidad-actual" name="cantidad-actual" value="10" min="0" required>
+                    <label for="add-capacidad">Capacidad Mesa:</label>
+                    <input type="number" id="add-capacidad" name="capacidad-mesa" value="2" required autofocus>
+                    <label for="add-capacidad-maxima">Tamaño Mesa:</label>
+                    <input type="number" id="add-capacidad-maxima" name="tamano-mesa" value="1" min="1" max="4" required>
+                    <label for="add-cantidad-mesas">Cantidad Mesas:</label>
+                    <input type="number" id="add-cantidad-mesas" name="cantidad-mesas" value="10" min="0" required>
+                    <label for="add-cantidad-actual">Cantidad Actual:</label>
+                    <input type="number" id="add-cantidad-actual" name="cantidad-actual" value="10" min="0" required>
                 `;
-            } else if(type === "productos") {
+            } else if (type === "productos") {
                 addModalFields.innerHTML = `
-                    <label for="edit-nombre">Nombre:</label>
-                    <input type="text" id="edit-nombre" name="name" required>
-                    <label for="edit-precio">Precio:</label>
-                    <input type="number" id="edit-capacidad" name="price" min="500" value="500" required>
-                    <label for="edit-descripcion">Descripción:</label>
-                    <textarea id="edit-descripcion" name="description" required></textarea>
-                    <label for="edit-descripcion">URL:</label>
-                    <input type="url" id="edit-capacidad" name="image" required>
+                    <label for="add-nombre">Nombre:</label>
+                    <input type="text" id="add-nombre" name="name" required>
+                    <label for="add-precio">Precio:</label>
+                    <input type="number" id="add-capacidad" name="price" min="500" value="500" required>
+                    <label for="add-descripcion">Descripción:</label>
+                    <textarea id="add-descripcion" name="description" required></textarea>
+                    <label for="add-descripcion">URL:</label>
+                    <input type="url" id="add-capacidad" name="image" required>
                 `;
+            } else if (type === "reporte") {
+                addModalFields.innerHTML = `
+                    <label for="add-tipo">Tipo:</label>
+                    <select id="add-tipo" name="tipo">
+                        <option value="Mensual">Mensual</option>
+                        <option value="Semanal">Semanal</option>
+                    </select>
+                    <label for="add-fecha">
+                    <input type="date" id="add-fecha" name="fecha">
+                `
             }
 
             // Show the modal
@@ -483,20 +509,20 @@ document.addEventListener("keydown", cerrarModalESC);
 // #endregion
 
 async function get_cantidad_mesas() {
-	const editForm = document.getElementById("edit-form");
-	const formData = new FormData(editForm);
-	try {
-		const response = await fetch("/get_h_mesas_admin/", {
-			method: "POST",
-			body: formData,
-		});
-		const data = await response.json();
+    const editForm = document.getElementById("edit-form");
+    const formData = new FormData(editForm);
+    try {
+        const response = await fetch("/get_h_mesas_admin/", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
 
-		if (!data.success) {
-			alert("Error al cargar");
-			console.log("Falló");
-		} 
-	} catch (error) {
-		console.error("Fetch error:", error);
-	}
+        if (!data.success) {
+            alert("Error al cargar");
+            console.log("Falló");
+        }
+    } catch (error) {
+        console.error("Fetch error:", error);
+    }
 }

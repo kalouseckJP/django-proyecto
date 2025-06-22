@@ -1,12 +1,14 @@
 from django.shortcuts import render
-from datetime import datetime, date, timedelta
-from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product
+from datetime import datetime, date, timedelta, time
+from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product, Reportes
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.db.models import Sum, Count, F, ExpressionWrapper, IntegerField, Q
 from django.utils.timezone import make_aware
 from django.utils import timezone
+import calendar
+
 
 # Create your views here.
 def registro(request):
@@ -24,17 +26,19 @@ def admin(request):
     lugares = Espacios.objects.all()
     mesas = Mesas.objects.all()
     productos = Product.objects.all()
+    reportes = Reportes.objects.all()
     
     today = date.today().isoformat() # AAAA-MM-DD
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
     return render(request, 'admin.html', {
         'reservas': reservas,
         'clientes': clientes,
-        'lugares': lugares,  # Usar la lista con capacidad dinámica
+        'lugares': lugares,
         'tiempo': tiemponow,
         'today': today,
         'mesas': mesas,
         'productos': productos,
+        'reportes': reportes
     })
 
 def front(request):
@@ -371,8 +375,8 @@ def login_cliente(request):
 
 def validacion_cliente(request):
     if request.method == "POST":
-        usuario = request.POST["username"]
-        password = request.POST["password"]
+        usuario = request.POST["RUT"]
+        password = request.POST["notpassword"]
         match = Cliente.objects.filter(
             Q(RUT = usuario) | Q(email = usuario) | Q(telefono = usuario)
         ).first()
@@ -710,3 +714,123 @@ def delete_productos(request, id):
         except Product.DoesNotExist:
             return JsonResponse({"success": False, "error": "Producto no encontrado"})
     return JsonResponse({"success": False, "error": "Método no permitido"})
+
+def get_reporte(request, id):
+    reportes = Reportes.objects.get(id = id)
+    data = {
+        "id": reportes.id,
+        "tipo": reportes.tipo,
+        "rango_inicio": reportes.rango_inicio,
+        "rango_final": reportes.rango_final,
+        "clientes": reportes.clientes
+    }
+    return JsonResponse(data)
+
+def add_reporte(request):
+    if request.method == 'POST':
+        tipo = request.POST['tipo']
+        print(tipo)
+        fecha = request.POST['fecha']
+        naive = datetime.fromisoformat(fecha)
+        fecha = make_aware(naive)
+        if tipo == "Mensual":
+            anio = fecha.year
+            mes = fecha.month
+            cuenta = Reserva.objects.filter(
+                fecha_reserva__year = anio,
+                fecha_reserva__month = mes
+            ).count()
+            inicio = date(anio, mes, 1)
+            dia_final = calendar.monthrange(anio, mes)[1]
+            final = date(anio, mes, dia_final)
+            print(f"incio: {inicio}")
+            print(f"final: {final}")
+            print(f"cuenta: {cuenta}")
+            reporte = Reportes.objects.create(
+                tipo = 'Mensual',
+                rango_inicio = inicio,
+                rango_final = final,
+                clientes = cuenta
+            )
+        else:
+            fecha_solo = fecha.date()
+            inicio_semana = fecha_solo - timedelta(days = fecha_solo.weekday())
+            fin_semana = inicio_semana + timedelta(days = 6)
+            
+            inicio_datetime = make_aware(datetime.combine(inicio_semana, time.min))
+            fin_datetime = make_aware(datetime.combine(fin_semana, time.max))
+            
+            cuenta = Reserva.objects.filter(
+                fecha_reserva__range=(inicio_datetime, fin_datetime)
+            ).count()
+            
+            reporte = Reportes.objects.create(
+                tipo = 'Semanal',
+                rango_inicio = inicio_semana,
+                rango_final = fin_semana,
+                clientes = cuenta
+            )
+            
+        new_row_html = render_to_string("partials/reporte_row.html", {"reporte": reporte})
+        return JsonResponse({"success":True, "new_row_html": new_row_html})
+    
+@csrf_exempt
+def delete_reporte(request, id):
+    if request.method == 'DELETE':
+        try:
+            reporte = Reportes.objects.get(id = id)
+            reporte.delete()
+            return JsonResponse({'success': True})
+        except Reportes.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Reporte no encontrado"})
+    return JsonResponse({"success": False, "error": "Método no permitido"})
+
+@csrf_exempt
+def edit_reporte(request):
+    if request.method == 'POST':
+        id = request.POST["id"]
+        reporte = Reportes.objects.get(id = id)
+        reporte.tipo = request.POST["tipo"]
+        reporte.save()
+        fecha = request.POST['fecha']
+        naive = datetime.fromisoformat(fecha)
+        fecha = make_aware(naive)
+        if reporte.tipo == "Mensual":
+            anio = fecha.year
+            mes = fecha.month
+            cuenta = Reserva.objects.filter(
+                fecha_reserva__year = anio,
+                fecha_reserva__month = mes
+            ).count()
+            inicio = date(anio, mes, 1)
+            dia_final = calendar.monthrange(anio, mes)[1]
+            final = date(anio, mes, dia_final)
+            print(f"incio: {inicio}")
+            print(f"final: {final}")
+            print(f"cuenta: {cuenta}")
+            reporte.rango_inicio = inicio
+            reporte.rango_final = final
+            reporte.clientes = cuenta
+        else:
+            fecha_solo = fecha.date()
+            inicio_semana = fecha_solo - timedelta(days = fecha_solo.weekday())
+            fin_semana = inicio_semana + timedelta(days = 6)
+            
+            inicio_datetime = make_aware(datetime.combine(inicio_semana, time.min))
+            fin_datetime = make_aware(datetime.combine(fin_semana, time.max))
+            
+            cuenta = Reserva.objects.filter(
+                fecha_reserva__range=(inicio_datetime, fin_datetime)
+            ).count()
+            
+            reporte.rango_inicio = inicio_semana
+            reporte.rango_final = fin_semana
+            reporte.clientes = cuenta
+        reporte.save()
+        return JsonResponse({"success": True,
+                             "id": id,
+                             "tipo": reporte.tipo,
+                             "rango_inicio": reporte.rango_inicio,
+                             "rango_final": reporte.rango_final,
+                             "clientes": reporte.clientes})
+    return JsonResponse({"success":False})
