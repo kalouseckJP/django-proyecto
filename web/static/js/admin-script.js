@@ -35,6 +35,8 @@ function cambiarTabla() {
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("mesas-content").style.display = "none";
                     document.getElementById("menu-content").style.display = "none";
+                    document.getElementById("empleado-content").style.display = "none";
+
                     // content = "<div id='admin-content-header'><h3>Gestion de Productos</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los productos.</p>";
                     break;
                 case "Clientes":
@@ -45,6 +47,8 @@ function cambiarTabla() {
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("mesas-content").style.display = "none";
                     document.getElementById("menu-content").style.display = "none";
+                    document.getElementById("empleado-content").style.display = "none";
+
                     // content = "<div id='admin-content-header'><h3>Gestion de Clientes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los clientes.</p>";
                     break;
                 case "Lugares":
@@ -55,6 +59,8 @@ function cambiarTabla() {
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("mesas-content").style.display = "none";
                     document.getElementById("menu-content").style.display = "none";
+                    document.getElementById("empleado-content").style.display = "none";
+
                     // content = "<div id='admin-content-header'><h3>Gestion de Ventas</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los ventas.</p>";
                     break;
                 case "Reportes":
@@ -65,6 +71,8 @@ function cambiarTabla() {
                     document.getElementById("reporte-content").style.display = "block";
                     document.getElementById("mesas-content").style.display = "none";
                     document.getElementById("menu-content").style.display = "none";
+                    document.getElementById("empleado-content").style.display = "none";
+
                     // content = "<div id='admin-content-header'><h3>Gestion de Reportes</h3><button type='button' id='add'><i class='bi bi-plus-circle'></i> Agregar</button></div><p>Aquí puedes gestionar los reportes.</p>";
                     break;
                 case "Mesas":
@@ -76,6 +84,8 @@ function cambiarTabla() {
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("mesas-content").style.display = "block";
                     document.getElementById("menu-content").style.display = "none";
+                    document.getElementById("empleado-content").style.display = "none";
+
                     break;
                 case "Menu":
                     adminContent.style.display = "none";
@@ -85,6 +95,21 @@ function cambiarTabla() {
                     document.getElementById("reporte-content").style.display = "none";
                     document.getElementById("mesas-content").style.display = "none";
                     document.getElementById("menu-content").style.display = "block";
+                    document.getElementById("empleado-content").style.display = "none";
+
+                    break;
+                case "Empleados":
+                    adminContent.style.display = "none";
+                    document.getElementById("reserva-content").style.display = "none";
+                    document.getElementById("cliente-content").style.display = "none";
+                    document.getElementById("lugar-content").style.display = "none";
+                    document.getElementById("reporte-content").style.display = "none";
+                    document.getElementById("mesas-content").style.display = "none";
+                    document.getElementById("menu-content").style.display = "none";
+                    document.getElementById("empleado-content").style.display = "block";
+                    cargarEmpleados();
+                    editarElemento();     
+                    eliminarElemento();   
                     break;
 
                 default:
@@ -204,7 +229,30 @@ function editarElemento(event) {
                             <label for="edit-fecha">
                             <input type="date" id="edit-fecha" name="fecha" value="${data.rango_inicio}">
                         `
+                    } else if (type === "empleado") {
+                        modalFields.innerHTML = `
+                        <input type="hidden" name="id" value="${data.id}">
+                        <label for="edit-nombre">Nombre:</label>
+                        <input type="text" id="edit-nombre" name="nombre" value="${data.nombre}" required>
+                        <label for="edit-apellido">Apellido:</label>
+                        <input type="text" id="edit-apellido" name="apellido" value="${data.apellido}" required>
+                        <label for="edit-rut">RUT:</label>
+                        <input type="text" id="edit-rut" name="RUT" value="${data.rut}" required>
+                        <label for="edit-email">Correo Electrónico:</label>
+                        <input type="email" id="edit-email" name="email" value="${data.email}" required>
+                        <label for="edit-telefono">Teléfono:</label>
+                        <input type="text" id="edit-telefono" name="telefono" value="${data.telefono}" required>
+                        <label for="edit-rol">Rol:</label>
+                        <input type="text" id="edit-rol" name="rol" value="${data.rol}" required>
+                        <label for="edit-asistencia">Asistencia:</label>
+                        <select id="edit-asistencia" name="asistencia">
+                            <option value="Presente" ${data.asistencia === "Presente" ? "selected" : ""}>Presente</option>
+                            <option value="Ausente" ${data.asistencia === "Ausente" ? "selected" : ""}>Ausente</option>
+                        </select>
+                    `;
                     }
+
+
 
                     modal.style.display = "flex";
                 });
@@ -263,6 +311,14 @@ function editarElemento(event) {
                         row.querySelector("td:nth-child(3)").textContent = data.rango_inicio || "N/A";
                         row.querySelector("td:nth-child(4)").textContent = data.rango_final || "N/A";
                         row.querySelector("td:nth-child(5)").textContent = data.clientes || "N/A";
+                    } else if (type === "empleado") {
+                        row.querySelector("td:nth-child(2)").textContent = data.nombre|| "N/A";
+                        row.querySelector("td:nth-child(3)").textContent = data.apellido || "N/A";
+                        row.querySelector("td:nth-child(4)").textContent = data.rut || "N/A";
+                        row.querySelector("td:nth-child(5)").textContent = data.email || "N/A";
+                        row.querySelector("td:nth-child(6)").textContent = data.telefono || "N/A";
+                        row.querySelector("td:nth-child(7)").textContent = data.rol || "N/A";
+                        row.querySelector("td:nth-child(8)").textContent = data.asistencia || "N/A";
                     }
 
                     closeModal();
@@ -420,6 +476,32 @@ function añadirElemento(event) {
                     <label for="add-fecha">
                     <input type="date" id="add-fecha" name="fecha">
                 `
+            } else if (type === "empleado") {
+                addModalFields.innerHTML = `
+                    <label for="add-nombre">Nombre:</label>
+                    <input type="text" id="add-nombre" name="nombre" required>
+                    
+                    <label for="add-apellido">Apellido:</label>
+                    <input type="text" id="add-apellido" name="apellido" required>
+                    
+                    <label for="add-rut">RUT:</label>
+                    <input type="text" id="add-rut" name="RUT" required>
+
+                    <label for="add-email">Correo Electrónico:</label>
+                    <input type="email" id="add-email" name="email" required>
+
+                    <label for="add-telefono">Teléfono:</label>
+                    <input type="text" id="add-telefono" name="telefono" required>
+
+                    <label for="add-rol">Rol:</label>
+                    <input type="text" id="add-rol" name="rol" required>
+
+                    <label for="add-asistencia">Asistencia:</label>
+                    <select id="add-asistencia" name="asistencia" required>
+                        <option value="Presente">Presente</option>
+                        <option value="Ausente">Ausente</option>
+                    </select>
+                `;
             }
 
             // Show the modal

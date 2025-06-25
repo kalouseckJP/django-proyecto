@@ -1,0 +1,18 @@
+<tr>
+    <td>{{ empleado.id }}</td>
+    <td>{{ empleado.nombre }}</td>
+    <td>{{ empleado.apellido }}</td>
+    <td>{{ empleado.rut }}</td>
+    <td>{{ empleado.email }}</td>
+    <td>{{ empleado.telefono }}</td>
+    <td>{{ empleado.rol }}</td>
+    <td>{{ empleado.asistencia }}</td>
+    <td class="tabla-elem-final">
+        <button type="button" class="edit-button" data-id="{{ empleado.id }}" data-type="empleado">
+            <i class="bi bi-pencil-square"></i> Editar
+        </button>
+        <button type="button" class="delete-button" data-id="{{ empleado.id }}" data-type="empleado">
+            <i class="bi bi-trash"></i> Eliminar
+        </button>
+    </td>
+</tr>

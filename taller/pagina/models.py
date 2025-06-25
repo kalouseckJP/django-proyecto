@@ -92,3 +92,17 @@ class Reportes(models.Model):
     clientes = models.PositiveIntegerField()
     def __str__(self):
         return f"{self.id} - {self.rango_inicio} - {self.rango_final} - Cliente: {self.clientes}"
+    
+class Empleado(models.Model):
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    rut = models.CharField(max_length=12, unique=True)
+    email = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=15)
+    rol = models.CharField(max_length=50)
+    
+    # Asistencia: True = Presente, False = Ausente
+    asistencia = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"

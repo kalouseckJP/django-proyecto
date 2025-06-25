@@ -42,6 +42,9 @@
                     <li>
                         <button type="button" value="Reportes">Reportes</button>
                     </li>
+                    <li>
+                        <button type="button" value="Empleados">Empleados</button>
+                    </li>
                 </ul>
             </nav>
             <div class="admin-content">
@@ -189,7 +192,7 @@
             <div id="reporte-content" class="admin-content tablas">
                 <div id="admin-content-header">
                     <h3>Reportes</h3>
-                     <button type="button" id="add" data-type="reporte">
+                    <button type="button" id="add" data-type="reporte">
                         <i class="bi bi-plus-circle"></i> Agregar
                     </button>
                 </div>
@@ -208,11 +211,11 @@
                         <tbody class="reservas-body">
                             {% for reporte in reportes %}
                                 <tr>
-                                    <td> {{ reporte.id }} </td>
-                                    <td> {{ reporte.tipo }} </td>
-                                    <td> {{ reporte.rango_inicio }} </td>
-                                    <td> {{ reporte.rango_final }} </td>
-                                    <td> {{ reporte.clientes }} </td>
+                                    <td>{{ reporte.id }}</td>
+                                    <td>{{ reporte.tipo }}</td>
+                                    <td>{{ reporte.rango_inicio }}</td>
+                                    <td>{{ reporte.rango_final }}</td>
+                                    <td>{{ reporte.clientes }}</td>
                                     <td class="tabla-elem-final">
                                         <button type="button" class="edit-button" data-id="{{ reporte.id }}" data-type="reporte">
                                             <i class="bi bi-pencil-square"></i> Editar
@@ -267,7 +270,6 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
             <div id="menu-content" class="admin-content tablas">
                 <div id="admin-content-header">
@@ -301,6 +303,53 @@
                                             <i class="bi bi-pencil-square"></i> Editar
                                         </button>
                                         <button type="button" class="delete-button" data-id="{{ p.id }}" data-type="productos">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="empleado-content" class="admin-content tablas">
+                <div id="admin-content-header">
+                    <h3>Empleados</h3>
+                    <button type="button" id="add" data-type="empleado">
+                        <i class="bi bi-plus-circle"></i> Agregar
+                    </button>
+                </div>
+                <div class="reservas" id="admin-content-titles">
+                    <table class="reservas-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>RUT</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Rol</th>
+                                <th>Asistencia</th>
+                                <th class="tabla-elem-final"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="reservas-body">
+                            {% for empleado in empleados %}
+                                <tr>
+                                    <td>{{ empleado.id }}</td>
+                                    <td>{{ empleado.nombre }}</td>
+                                    <td>{{ empleado.apellido }}</td>
+                                    <td>{{ empleado.rut }}</td>
+                                    <td>{{ empleado.email }}</td>
+                                    <td>{{ empleado.telefono }}</td>
+                                    <td>{{ empleado.rol }}</td>
+                                    <td>{{ empleado.asistencia }}</td>
+                                    <td class="tabla-elem-final">
+                                        <button type="button" class="edit-button" data-id="{{ empleado.id }}" data-type="empleado">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </button>
+                                        <button type="button" class="delete-button" data-id="{{ empleado.id }}" data-type="empleado">
                                             <i class="bi bi-trash"></i> Eliminar
                                         </button>
                                     </td>

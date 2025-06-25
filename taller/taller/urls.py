@@ -72,5 +72,10 @@ urlpatterns = [
     path("add_reporte/", views.add_reporte, name="add_reporte"),
     path("delete_reporte/<int:id>/", views.delete_reporte, name="delete_reporte"),
     path("edit_reporte/", views.edit_reporte, name="edit_reporte"),
-    path("get_reporte/<int:id>/", views.get_reporte, name="get_reporte")
+    path("get_reporte/<int:id>/", views.get_reporte, name="get_reporte"),
+    
+    path('add_empleado/', views.add_empleado, name='add_empleado'),
+    path('get_empleado/<int:id>/', views.get_empleado, name='get_empleado'),
+    path('edit_empleado/', views.edit_empleado, name='edit_empleado'),
+    path('delete_empleado/<int:id>/', views.delete_empleado, name='delete_empleado'),
 ]

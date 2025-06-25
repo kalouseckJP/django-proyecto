@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from datetime import datetime, date, timedelta, time
-from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product, Reportes
+from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product, Reportes, Empleado
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
@@ -8,6 +8,7 @@ from django.db.models import Sum, Count, F, ExpressionWrapper, IntegerField, Q
 from django.utils.timezone import make_aware
 from django.utils import timezone
 import calendar
+import json
 
 
 # Create your views here.
@@ -27,6 +28,7 @@ def admin(request):
     mesas = Mesas.objects.all()
     productos = Product.objects.all()
     reportes = Reportes.objects.all()
+    empleados = Empleado.objects.all()
     
     today = date.today().isoformat() # AAAA-MM-DD
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
@@ -38,7 +40,8 @@ def admin(request):
         'today': today,
         'mesas': mesas,
         'productos': productos,
-        'reportes': reportes
+        'reportes': reportes,
+        'empleados': empleados,
     })
 
 def front(request):
@@ -834,3 +837,58 @@ def edit_reporte(request):
                              "rango_final": reporte.rango_final,
                              "clientes": reporte.clientes})
     return JsonResponse({"success":False})
+
+def add_empleado(request):
+    if request.method == 'POST':
+        empleado = Empleado.objects.create(
+            nombre=request.POST['nombre'],
+            apellido=request.POST['apellido'],
+            rut=request.POST['RUT'],
+            email=request.POST['email'],
+            telefono=request.POST['telefono'],
+            rol=request.POST['rol'],
+            asistencia=(request.POST['asistencia'] == 'Presente')
+        )
+        new_row_html = render_to_string("partials/empleado_row.html", {"empleado": empleado})
+        return JsonResponse({'success': True, "new_row_html": new_row_html})
+    return JsonResponse({'success': False, 'message': 'Método no permitido'})
+
+def get_empleado(request,id):
+    empleado = Empleado.objects.get(id=id)
+    data = {
+        'id': empleado.id,
+        'nombre': empleado.nombre,
+        'apellido': empleado.apellido,
+        'rut': empleado.rut,
+        'email': empleado.email,
+        'telefono': empleado.telefono,
+        'rol': empleado.rol,
+        'asistencia': 'Presente' if empleado.asistencia else 'Ausente',
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def edit_empleado(request):
+    if request.method == 'POST':
+        empleado = Empleado.objects.get(id=request.POST['id'])
+        empleado.nombre = request.POST['nombre']
+        empleado.apellido = request.POST['apellido']
+        empleado.rut = request.POST['RUT']
+        empleado.email = request.POST['email']
+        empleado.telefono = request.POST['telefono']
+        empleado.rol = request.POST['rol']
+        empleado.asistencia = request.POST['asistencia'] == 'Presente'
+        empleado.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'message': 'Método no permitido'})
+
+@csrf_exempt
+def delete_empleado(request, id):
+    if request.method == 'DELETE':
+        try:
+            empleado = Empleado.objects.get(id=id)
+            empleado.delete()
+            return JsonResponse({'success': True})
+        except Empleado.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Empleado no encontrado'})
+    return JsonResponse({'success': False, 'message': 'Método no permitido'})
