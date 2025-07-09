@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator # Añadido para validación de calificación
 
 # Create your models here.
 
@@ -79,7 +80,7 @@ class ReservationTable(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.PositiveIntegerField()
     image = models.URLField()
     def __str__(self):
         return f"{self.name} - Valor: {self.price}"
@@ -106,3 +107,26 @@ class Empleado(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
+    
+class Comentario(models.Model):
+    id = models.AutoField(primary_key=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='comentarios')
+    reserva = models.ForeignKey(Reserva, on_delete=models.CASCADE, related_name='comentarios', null=True, blank=True)
+    
+    # Campo corregido de 'texto_comentario' a 'contenido' para que coincida con el formulario
+    contenido = models.TextField() 
+    
+    calificacion = models.IntegerField(
+        choices=[(i, str(i)) for i in range(1, 6)], # Las opciones del 1 al 5
+        null=True, 
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(5)] # Añadido validadores para asegurar el rango
+    ) 
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Añadido para ordenar los comentarios por fecha de creación descendente (más recientes primero)
+        ordering = ['-fecha_creacion'] 
+
+    def __str__(self):
+        return f"Comentario de {self.cliente.nombre} sobre {self.reserva.id if self.reserva else 'general'}"

@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
 from datetime import datetime, date, timedelta, time
-from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product, Reportes, Empleado
+from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product, Reportes, Empleado, Comentario
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
@@ -9,6 +9,14 @@ from django.utils.timezone import make_aware
 from django.utils import timezone
 import calendar
 import json
+
+from .forms import ComentarioForm # Importar ComentarioForm
+from django.contrib import messages # ¡Importa esto!
+
+# Importar JWT para manejar el token si lo usas en la cookie 'loggedIn' del admin
+# Aunque parece que para el cliente usas 'user_id' que es solo el RUT
+import jwt
+from django.conf import settings # Necesario para settings.SECRET_KEY si usas JWT
 
 
 # Create your views here.
@@ -29,6 +37,7 @@ def admin(request):
     productos = Product.objects.all()
     reportes = Reportes.objects.all()
     empleados = Empleado.objects.all()
+    comentarios = Comentario.objects.all()
     
     today = date.today().isoformat() # AAAA-MM-DD
     tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
@@ -42,11 +51,55 @@ def admin(request):
         'productos': productos,
         'reportes': reportes,
         'empleados': empleados,
+        'comentarios': comentarios
     })
 
+# *** VISTA FRONT CORREGIDA ***
 def front(request):
-    response = render(request, 'front.html')
-    response.delete_cookie('loggedIn')
+    cliente_logueado = None
+    # Verificamos si la cookie 'user_id' existe (lo que indica que un Cliente está logueado)
+    if 'user_id' in request.COOKIES:
+        rut_cliente = request.COOKIES['user_id']
+        try:
+            cliente_logueado = Cliente.objects.get(RUT=rut_cliente)
+        except Cliente.DoesNotExist:
+            # Si la cookie existe pero el cliente no, la borramos y tratamos como no logueado
+            response = render(request, 'front.html', {'cliente': None})
+            response.delete_cookie('user_id')
+            response.delete_cookie('user_nombre')
+            response.delete_cookie('user_apellido')
+            messages.error(request, "Tu sesión de cliente no es válida. Por favor, inicia sesión nuevamente.")
+            return response
+        except Exception as e:
+            # Otros errores al intentar obtener el cliente (ej. base de datos)
+            response = render(request, 'front.html', {'cliente': None})
+            response.delete_cookie('user_id')
+            response.delete_cookie('user_nombre')
+            response.delete_cookie('user_apellido')
+            messages.error(request, f"Ocurrió un error al cargar tu perfil: {e}")
+            return response
+
+    context = {
+        'cliente': cliente_logueado, # Pasamos el objeto cliente (o None) a la plantilla
+        # Añadimos los comentarios a la vista para poder mostrarlos
+        'comentarios': Comentario.objects.all().order_by('-fecha_creacion') # Puedes ordenar como quieras
+    }
+    
+    response = render(request, 'front.html', context)
+    
+    # La línea response.delete_cookie('loggedIn') es solo para el admin.
+    # Si quieres que 'front' sea una página para usuarios logueados, no debes borrar 'loggedIn' aquí,
+    # a menos que sea una cookie completamente diferente para el admin.
+    # Si 'loggedIn' es una cookie de admin y 'user_id' es de cliente, está bien que 'front' borre 'loggedIn' si no es una página de admin.
+    # Pero si 'loggedIn' es la misma cookie que indica que ALGUIEN está logueado (admin o cliente), entonces esta línea es problemática.
+    # Asumo que 'loggedIn' es solo para el admin y 'user_id' para el cliente.
+    # Si el cliente está logueado, no debemos borrar ninguna de sus cookies aquí.
+    if cliente_logueado is None:
+        # Borramos la cookie 'loggedIn' (si es de admin y no queremos que afecte al cliente)
+        # O si es una vista que no debería mantener ninguna sesión activa por defecto.
+        # Esto depende de cómo uses la cookie 'loggedIn'
+        response.delete_cookie('loggedIn') 
+    
     return response
 
 def hacer_reserva(request):
@@ -376,6 +429,7 @@ def login_cliente(request):
     response = render(request,'inicio_sesion.html')
     return response
 
+@csrf_exempt
 def validacion_cliente(request):
     if request.method == "POST":
         usuario = request.POST["RUT"]
@@ -394,13 +448,29 @@ def validacion_cliente(request):
     return JsonResponse({"success": False})
 
 def usuario(request):
-    RUT = Cliente.objects.get(RUT = request.COOKIES.get('user_id'))
-    now_local = timezone.localtime(timezone.now())-timedelta(hours=4)
-    reservas = Reserva.objects.filter(RUT = RUT, fecha_reserva__gte=now_local)
+    # Aquí también deberías verificar la cookie 'user_id' de forma más robusta
+    # y redirigir si no existe o el cliente no se encuentra
+    user_rut = request.COOKIES.get('user_id')
+    if not user_rut:
+        messages.error(request, "Necesitas iniciar sesión para ver tu perfil.")
+        return redirect('login_cliente')
+    
+    try:
+        RUT_obj = Cliente.objects.get(RUT=user_rut)
+    except Cliente.DoesNotExist:
+        messages.error(request, "Tu perfil de cliente no se encontró. Por favor, inicia sesión de nuevo.")
+        response = redirect('login_cliente')
+        response.delete_cookie('user_id')
+        response.delete_cookie('user_nombre')
+        response.delete_cookie('user_apellido')
+        return response
+
+    now_local = timezone.localtime(timezone.now()) - timedelta(hours=4)
+    reservas = Reserva.objects.filter(RUT = RUT_obj, fecha_reserva__gte=now_local)
     if not reservas:
-        response = render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT, 'vacio': True})
+        response = render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT_obj, 'vacio': True})
     else:
-        response = render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT, 'vacio': False})
+        response = render(request, 'usuario.html', {'reservas': reservas, 'cliente': RUT_obj, 'vacio': False})
     return response
 
 def get_horarios_usuario(request):
@@ -654,8 +724,8 @@ def delete_mesas(request, id):
             mesa = Mesas.objects.get(id=id)
             mesa.delete()
             return JsonResponse({"success": True})
-        except Cliente.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Cliente no encontrado"})
+        except Mesas.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Cliente no encontrada"})
     return JsonResponse({"success": False, "error": "Método no permitido"})
 
 def product_list(request):
@@ -892,3 +962,125 @@ def delete_empleado(request, id):
         except Empleado.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Empleado no encontrado'})
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
+
+# --- Vistas de comentarios ---
+@csrf_exempt # Agregamos csrf_exempt ya que no estás usando {% csrf_token %} en el form que pasaste
+def crear_comentario(request):
+    # Aquí NO usamos @login_required de Django, sino nuestra propia lógica de cookie
+    cliente_logueado = None
+    if 'user_id' in request.COOKIES:
+        try:
+            cliente_logueado = Cliente.objects.get(RUT=request.COOKIES.get('user_id'))
+        except Cliente.DoesNotExist:
+            messages.error(request, "Necesitas iniciar sesión para enviar un comentario.")
+            return redirect('login_cliente') # O a donde sea tu login de cliente
+
+    if cliente_logueado is None: # Si por alguna razón no se encontró el cliente
+        messages.error(request, "Necesitas iniciar sesión para enviar un comentario.")
+        return redirect('login_cliente') # Redirige al login si no hay cliente
+
+    if request.method == 'POST':
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.cliente = cliente_logueado # Asigna el cliente logueado
+            comentario.save()
+            messages.success(request, "Tu comentario ha sido enviado con éxito.")
+            # Redirige a la página 'front' o a la lista de comentarios
+            return redirect('front') # O a la URL de listar_comentarios
+        else:
+            # Si el formulario no es válido, renderiza front.html con los errores y el cliente
+            messages.error(request, "Por favor, corrige los errores en tu comentario.")
+            context = {
+                'cliente': cliente_logueado,
+                'form': form, # Pasamos el formulario con los errores
+                'comentarios': Comentario.objects.all().order_by('-fecha_creacion') # Para que siga mostrando los comentarios existentes
+            }
+            return render(request, 'front.html', context)
+    else:
+        # Método GET para mostrar el formulario vacío (si se llega aquí directamente)
+        form = ComentarioForm()
+        context = {
+            'cliente': cliente_logueado,
+            'form': form,
+            'comentarios': Comentario.objects.all().order_by('-fecha_creacion')
+        }
+        return render(request, 'front.html', context) # Renderiza front.html con el formulario
+
+@csrf_exempt
+def listar_comentarios(request):
+    # En esta vista podríamos listar todos los comentarios,
+    # o solo los de un cliente específico si pasamos su ID
+    comentarios = Comentario.objects.all().order_by('-fecha_creacion') # Obtiene todos los comentarios
+    
+    # También podemos pasar el cliente logueado si es necesario para el template
+    cliente_logueado = None
+    if 'user_id' in request.COOKIES:
+        try:
+            cliente_logueado = Cliente.objects.get(RUT=request.COOKIES.get('user_id'))
+        except Cliente.DoesNotExist:
+            pass # No pasa nada, simplemente cliente_logueado se queda como None
+
+    context = {
+        'comentarios': comentarios,
+        'cliente': cliente_logueado,
+        'form': ComentarioForm() # Pasamos un formulario vacío también por si quieren añadir uno desde esta página
+    }
+    # Por ahora, voy a hacer que redirija a front.html.
+    # Si quieres una página dedicada, deberías crear un template 'comentarios/listar_comentarios.html'
+    # y renderizarlo aquí.
+    return render(request, 'front.html', context)
+
+# --- Fin vistas de comentarios ---
+@csrf_exempt
+def editar_comentario(request, comentario_id):
+    comentario = get_object_or_404(Comentario, id=comentario_id)
+    
+    cliente_logueado = None
+    if 'user_id' in request.COOKIES:
+        try:
+            cliente_logueado = Cliente.objects.get(RUT=request.COOKIES.get('user_id'))
+        except Cliente.DoesNotExist:
+            pass # Si la cookie es inválida, cliente_logueado será None
+    
+    if comentario.cliente != cliente_logueado:
+        messages.error(request, "No tienes permiso para editar este comentario.")
+        return redirect('front')
+
+    if request.method == 'POST':
+        form = ComentarioForm(request.POST, instance=comentario)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tu comentario ha sido actualizado con éxito.")
+            return redirect('front')
+    else:
+        form = ComentarioForm(instance=comentario)
+
+    return render(request, 'editar_comentario.html', {'form': form, 'comentario': comentario})
+
+
+@csrf_exempt
+def eliminar_comentario(request, comentario_id):
+    comentario = get_object_or_404(Comentario, id=comentario_id)
+    
+    # Verificamos el cliente logueado
+    cliente_logueado = None
+    if 'user_id' in request.COOKIES:
+        try:
+            cliente_logueado = Cliente.objects.get(RUT=request.COOKIES.get('user_id'))
+        except Cliente.DoesNotExist:
+            pass
+            
+    # ¡SEGURIDAD! Verificamos que el cliente sea el dueño
+    if comentario.cliente != cliente_logueado:
+        messages.error(request, "No tienes permiso para eliminar este comentario.")
+        return redirect('front')
+
+    if request.method == 'POST':
+        # Si el usuario confirma (enviando el form), eliminamos el objeto
+        comentario.delete()
+        messages.success(request, "El comentario ha sido eliminado.")
+        return redirect('front')
+    
+    # Si es un GET, mostramos la página de confirmación
+    return render(request, 'eliminar_comentario.html', {'comentario': comentario})

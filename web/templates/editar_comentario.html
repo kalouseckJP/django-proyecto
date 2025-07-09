@@ -1,0 +1,64 @@
+{# templates/editar_comentario.html #}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Comentario</title>
+    {# Si tienes un archivo CSS externo, puedes vincularlo aquí #}
+    {# <link rel="stylesheet" href="{% static 'css/styles.css' %}"> #}
+</head>
+<body>
+
+    <header id="banner">
+        <h1>Menú Principal</h1>
+        <div id="divLogin">
+            {# Mostramos el nombre del usuario que está editando #}
+            {% if comentario.cliente.nombre %}
+                <span class="header-button">Editando como: {{ comentario.cliente.nombre }}</span>
+            {% endif %}
+            <a id="login-button" class="header-button" href="{% url 'index' %}">Admin</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Editar Comentario</h2>
+        <form method="post">
+            {% csrf_token %}
+            <p>Estás editando el comentario que publicaste el {{ comentario.fecha_creacion|date:"d M Y" }}.</p>
+            
+            <div class="form-group">
+                {{ form.contenido.label_tag }}
+                {{ form.contenido }}
+                {{ form.contenido.errors }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.calificacion.label_tag }}
+                {{ form.calificacion }}
+                {{ form.calificacion.errors }}
+            </div>
+
+            <button type="submit" class="btn-submit">Guardar Cambios</button>
+            <a href="{% url 'front' %}" class="btn-cancelar">Cancelar</a>
+        </form>
+    </div>
+
+    {# Estilos para esta página específica #}
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f4; margin: 0; }
+        header#banner { background-color: rgb(220, 159, 80); color: black; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        header#banner h1 { margin: 0; }
+        .header-button { color: black; text-decoration: none; padding: 8px 12px; border: 1px solid black; border-radius: 4px; margin-left: 10px; }
+        .container { max-width: 600px; margin: 40px auto; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group textarea, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
+        .btn-submit { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-cancelar { text-decoration: none; background-color: #6c757d; color: white; padding: 10px 15px; border-radius: 4px; }
+    </style>
+
+</body>
+</html>

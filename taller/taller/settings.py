@@ -124,3 +124,16 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# --- Configuración de autenticación para redirección ---
+# URL a la que se redirige a los usuarios después de iniciar sesión con éxito.
+# Puedes cambiarla según la página a la que quieres que vayan los usuarios logueados.
+# Por ejemplo, si tienes una página de perfil de usuario en /usuario/:
+LOGIN_REDIRECT_URL = '/usuario/'
+# O si quieres que vayan a la página de inicio:
+# LOGIN_REDIRECT_URL = '/'
+
+# URL a la que se redirige a los usuarios que necesitan iniciar sesión.
+# Por defecto, Django usa '/accounts/login/', lo cual es manejado por 'django.contrib.auth.urls'.
+# No necesitas definirla explícitamente si usas el include estándar en urls.py.
+# LOGIN_URL = '/accounts/login/'

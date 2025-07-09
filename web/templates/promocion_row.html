@@ -1,0 +1,21 @@
+<tr id="promocion-{{ promocion.id }}">
+    <td>{{ promocion.nombre }}</td>
+    <td>{{ promocion.descripcion|default:"N/A" }}</td>
+    <td>{{ promocion.tipo_descuento|capfirst }}</td>
+    <td>{{ promocion.valor_descuento }}{% if promocion.tipo_descuento == 'porcentaje' %}%{% else %}${% endif %}</td>
+    <td>{{ promocion.producto.name }}</td>
+    <td>{{ promocion.fecha_inicio|date:"Y-m-d H:i" }}</td>
+    <td>{{ promocion.fecha_fin|date:"Y-m-d H:i" }}</td>
+    <td>{{ promocion.dias_semana_aplicables|default:"Todos" }}</td>
+    <td>
+        {% if promocion.esta_activo %}
+            <span style="color: green;">Activa</span>
+        {% else %}
+            <span style="color: red;">Inactiva</span>
+        {% endif %}
+    </td>
+    <td>
+        <button onclick="editPromocion({{ promocion.id }})" class="btn-edit">Editar</button>
+        <button onclick="deletePromocion({{ promocion.id }})" class="btn-delete">Eliminar</button>
+    </td>
+</tr>

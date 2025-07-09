@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from pagina import views
 
 urlpatterns = [
@@ -78,4 +78,16 @@ urlpatterns = [
     path('get_empleado/<int:id>/', views.get_empleado, name='get_empleado'),
     path('edit_empleado/', views.edit_empleado, name='edit_empleado'),
     path('delete_empleado/<int:id>/', views.delete_empleado, name='delete_empleado'),
+
+    path('accounts/register/', views.registro, name='register'),
+
+    # --- Rutas para los comentarios ---
+    path('comentarios/nuevo/', views.crear_comentario, name='crear_comentario'),
+    path('comentarios/', views.listar_comentarios, name='listar_comentarios'),
+    path('comentario/<int:comentario_id>/editar/', views.editar_comentario, name='editar_comentario'),
+    path('comentario/<int:comentario_id>/eliminar/', views.eliminar_comentario, name='eliminar_comentario'),
+
+    # --- AÑADIDO: Rutas de autenticación de Django ---
+    # Esto incluye paths como /accounts/login/, /accounts/logout/, /accounts/password_change/, etc.
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
