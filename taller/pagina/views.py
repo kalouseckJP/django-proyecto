@@ -269,9 +269,11 @@ def delete_lugar(request, id):
 
 def add_reserva(request):
     if request.method == "POST":
-        cliente = Cliente.objects.get(RUT=request.POST["RUT"])
+        try:
+            cliente = Cliente.objects.get(RUT=request.POST["RUT"])
+        except Cliente.DoesNotExist:
+            return JsonResponse({'success': False, 'error':True, 'noCliente':True})
         lugar = Espacios.objects.get(id=request.POST["espacio"])
-
         fecha_reserva = request.POST["fecha_reserva"]
         naive_datetime = datetime.fromisoformat(fecha_reserva)
         aware_datetime = make_aware(naive_datetime)

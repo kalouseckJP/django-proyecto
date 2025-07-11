@@ -115,8 +115,8 @@ function cambiarTabla() {
                     document.getElementById("empleado-content").style.display = "block";
                     document.getElementById("promociones-content").style.display = "none";
                     cargarEmpleados();
-                    editarElemento();     
-                    eliminarElemento();   
+                    editarElemento();
+                    eliminarElemento();
                     break;
                 case "Promociones":
                     adminContent.style.display = "none";
@@ -317,19 +317,19 @@ function editarElemento(event) {
                                 <option value="false" ${!data.esta_activo ? 'selected' : ''}>Inactivo</option>
                             </select>
                         `;
-            const productoSelect = document.getElementById("edit-producto-promocion");
-            fetch("/products/")
-             .then(response => response.json())
-            .then(responseData => {
-                const productos = responseData.products;
-                productos.forEach(producto => {
-                    const option = document.createElement("option");
-                    option.value = producto.id;
-                    option.textContent = producto.name;
-                    productoSelect.appendChild(option);
-                });
-            })
-            .catch(error => console.error("Error fetching productos:", error));
+                        const productoSelect = document.getElementById("edit-producto-promocion");
+                        fetch("/products/")
+                            .then(response => response.json())
+                            .then(responseData => {
+                                const productos = responseData.products;
+                                productos.forEach(producto => {
+                                    const option = document.createElement("option");
+                                    option.value = producto.id;
+                                    option.textContent = producto.name;
+                                    productoSelect.appendChild(option);
+                                });
+                            })
+                            .catch(error => console.error("Error fetching productos:", error));
                     }
                     modal.style.display = "flex";
                 });
@@ -347,10 +347,10 @@ function editarElemento(event) {
 
         if (type === 'promocion') {
             const dias = Array.from(form.querySelectorAll('input[name="dias_semana_aplicables"]:checked')).map(cb => cb.value);
-            formData.delete('dias_semana_aplicables'); 
+            formData.delete('dias_semana_aplicables');
             formData.append('dias_semana_aplicables', dias.join(','));
             const estaActivo = form.querySelector('#edit-esta-activo').value;
-            formData.set('esta_activo', estaActivo); 
+            formData.set('esta_activo', estaActivo);
         }
 
         let url = `/edit_${type}/`;
@@ -398,12 +398,12 @@ function editarElemento(event) {
                         row.querySelector("td:nth-child(4)").textContent = data.cantidad_mesas || "N/A";
                         row.querySelector("td:nth-child(5)").textContent = data.cantidad_actual || "N/A";
                     } else if (type === "reporte") {
-                        row.querySelector("td:nth-child(2)").textContent = data.tipo|| "N/A";
+                        row.querySelector("td:nth-child(2)").textContent = data.tipo || "N/A";
                         row.querySelector("td:nth-child(3)").textContent = data.rango_inicio || "N/A";
                         row.querySelector("td:nth-child(4)").textContent = data.rango_final || "N/A";
                         row.querySelector("td:nth-child(5)").textContent = data.clientes || "N/A";
                     } else if (type === "empleado") {
-                        row.querySelector("td:nth-child(2)").textContent = data.nombre|| "N/A";
+                        row.querySelector("td:nth-child(2)").textContent = data.nombre || "N/A";
                         row.querySelector("td:nth-child(3)").textContent = data.apellido || "N/A";
                         row.querySelector("td:nth-child(4)").textContent = data.rut || "N/A";
                         row.querySelector("td:nth-child(5)").textContent = data.email || "N/A";
@@ -415,8 +415,8 @@ function editarElemento(event) {
                         const fechaInicio = new Date(data.fecha_inicio).toLocaleString('es-CL');
                         const fechaFin = new Date(data.fecha_fin).toLocaleString('es-CL');
                         const estado = data.esta_activo ? 'Activo' : 'Inactivo';
-                        const valorDescuento = data.tipo_descuento === 'porcentaje' 
-                            ? `${parseFloat(data.valor_descuento).toFixed(2)}%` 
+                        const valorDescuento = data.tipo_descuento === 'porcentaje'
+                            ? `${parseFloat(data.valor_descuento).toFixed(2)}%`
                             : `$${parseInt(data.valor_descuento)}`;
                         row.querySelector("td:nth-child(2)").textContent = data.nombre || "N/A";
                         row.querySelector("td:nth-child(3)").textContent = data.producto || "N/A";
@@ -519,7 +519,7 @@ function añadirElemento(event) {
                 `;
 
                 const lugarSelect = document.getElementById("add-lugar");
-                fetch(`/get_lugares/`) 
+                fetch(`/get_lugares/`)
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(lugar => {
@@ -627,7 +627,7 @@ function añadirElemento(event) {
             formData.delete('dias_semana_aplicables');
             formData.append('dias_semana_aplicables', dias.join(','));
         }
-        
+
         let url = `/add_${type}/`;
         if (type === 'promocion') {
             url = '/promociones/add_edit/'; // Correct URL for promotions
@@ -653,14 +653,18 @@ function añadirElemento(event) {
                     newRow.innerHTML = data.new_row_html; // El servidor debe devolver el HTML de la nueva fila.
                     if (tableBody) {
                         tableBody.appendChild(newRow);
-                        } else {
+                    } else {
                         console.error(`No se encontró el cuerpo de la tabla para: ${type}`);
                     }
 
 
                     closeAddModal();
                 } else {
-                    alert("Error al agregar el elemento.");
+                    if (data.noCliente) {
+                        alert(`No existe`);
+                    } else {
+                        alert("Error al agregar el elemento.");
+                    }
                 }
             });
     });
