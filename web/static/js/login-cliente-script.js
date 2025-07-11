@@ -15,7 +15,7 @@ function validar_datos_cliente() {
             .then(data => {
                 if (data.success) {
                     if (data.existe) {
-                        window.location.href = "front"
+                        window.location.href = "/front"
                     } else {
                         error.classList.add("error")
                     }
