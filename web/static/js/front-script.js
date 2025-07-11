@@ -29,7 +29,7 @@ function cambiar_inicio() {
         const apellido = search_cookie('user_apellido');
         const divLogin = document.getElementById("divLogin");
         divLogin.innerHTML = `
-            <a id="user-button" class="header-button" href="usuario">${nombre} ${apellido} <i class="bi bi-person-circle"></i></a>
+            <a id="user-button" class="header-button" href="/usuario">${nombre} ${apellido} <i class="bi bi-person-circle"></i></a>
             <button id="cerrar-sesion" class="header-button">Cerrar Sesion</button>
         `
     }
@@ -55,9 +55,9 @@ function accion_boton_reserva() {
     const button = document.getElementById("hacer-reserva-button");
     button.addEventListener("click", () => {
         if (cliente_logged()) {
-            window.location.href = "reservaciones"
+            window.location.href = "/reservaciones"
         }else {
-            window.location.href = "login_cliente"
+            window.location.href = "/login_cliente"
         }
     })
 }

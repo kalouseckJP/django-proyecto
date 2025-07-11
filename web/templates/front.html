@@ -21,10 +21,12 @@
   </head>
   <body class="frente">
     <header id="banner">
-      <h1>Menú Principal</h1>
+      <a href="{% url 'front' %}" id="menu-button">
+        <h1>Menú Principal</h1>
+      </a>
       <div id="divLogin">
-        <a id="inicio-button" class="header-button" href="{{ 'login_cliente' }}">Inicio Sesión</a>
-        <a id="registro-button" class="header-button" href="{{ "registro" }}">Registro</a>
+        <a id="inicio-button" class="header-button" href="{% url 'login_cliente' %}">Inicio Sesión</a>
+        <a id="registro-button" class="header-button" href="{% url "registro" %}">Registro</a>
         <a id="login-button" class="header-button" href={% url "index" %}>Admin</a>
       </div>
     </header>
@@ -108,17 +110,29 @@
   const limit = 10;
   let loadingInProgress = false;
 
-  function createProduct(product) {
-    const div = document.createElement('div');
-    div.className = 'product';
-    div.innerHTML = `
-      <img src="${product.image_url}" alt="${product.name}">
-      <div class="description">${product.name}</div>
-      <div class="description">${product.description}</div>
-      <div class="price">$${product.price}</div>
-    `;
-    return div;
+function createProduct(product) {
+  const div = document.createElement('div');
+  div.className = 'product';
+
+  // Generamos el HTML para el precio de forma condicional
+  let priceHTML = '';
+  if (product.original_price) {
+      // Si existe un 'original_price', mostramos la oferta
+      priceHTML = `<div class="price"><del>$${product.original_price}</del> <span class="promo-price">$${product.price}</span></div>`;
+  } else {
+      // De lo contrario, mostramos el precio normal
+      priceHTML = `<div class="price">$${product.price}</div>`;
   }
+
+  // Usamos el HTML del precio que acabamos de generar
+  div.innerHTML = `
+    <img src="${product.image_url}" alt="${product.name}">
+    <div class="description">${product.name}</div>
+    <div class="description">${product.description}</div>
+    ${priceHTML}
+  `;
+  return div;
+}
 
   async function loadProducts() {
     if (loadingInProgress) return;

@@ -32,9 +32,9 @@
                 </div>
                 <span id="datInc">Los datos ingresados son incorrectos</span>
                 <input type="submit" value="Iniciar Sesión" name="loginFormCliente" id="submit">
-                <a href="{{ "front" }}">Cancelar</a>
+                <a href="{% url "front" %}">Cancelar</a>
             </form>
         </div>
-        <a id="registro" href={{ 'registro' }}>Registrarse</a>
+        <a id="registro" href={% url 'registro' %}>Registrarse</a>
     </body>
 </html>

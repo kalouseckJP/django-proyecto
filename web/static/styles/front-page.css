@@ -71,7 +71,7 @@ header .header-button {
 header a#menu-button {
     display: flex;
     align-content: center;
-    justify-content: center;  
+    justify-content: center;
     background-color: transparent;
     padding: 0;
     margin: 0;
@@ -101,7 +101,6 @@ header a#menu-button {
 }
 
 img {
-    margin: 0 5px;
     width: 90%;
     height: auto;
     max-width: 800px;
@@ -124,4 +123,77 @@ img {
         width: 95%;
         height: auto;
     }
+}
+
+.comentario {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: background-color 0.25s;
+}
+
+.comentario:hover {
+    background-color: #ebebeb;
+}
+
+.btn-editar {
+    background-color: rgb(82, 164, 241);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.btn-editar:hover {
+    background-color: rgb(60, 117, 171);
+}
+
+.btn-eliminar {
+    background-color: rgb(251, 92, 92);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.btn-eliminar:hover {
+    background-color: rgb(191, 71, 71);
+}
+
+.comentarios-section {
+    display: grid;
+    justify-items: center;
+}
+
+.comentario-form {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #e9e9e9;
+}
+
+.form-group {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid;
+    padding: 0.5rem;
+}
+
+.form-control:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-reservacion {
+    background-color: #2C2C2C;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 2rem 0;
+    border-radius: 5px;
 }

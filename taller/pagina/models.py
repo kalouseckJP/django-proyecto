@@ -130,3 +130,41 @@ class Comentario(models.Model):
 
     def __str__(self):
         return f"Comentario de {self.cliente.nombre} sobre {self.reserva.id if self.reserva else 'general'}"
+    
+    
+class Promocion(models.Model):
+    # Opciones para el tipo de descuento
+    TIPO_DESCUENTO_CHOICES = [
+        ('porcentaje', 'Porcentaje'),
+        ('monto_fijo', 'Monto Fijo'),
+    ]
+
+    nombre = models.CharField(max_length=200)
+    descripcion = models.TextField(blank=True, null=True)
+    
+    tipo_descuento = models.CharField(
+        max_length=20,
+        choices=TIPO_DESCUENTO_CHOICES,
+        default='porcentaje'
+    )
+    valor_descuento = models.IntegerField(
+        max_length=2
+    )
+    
+    # ForeignKey al modelo Product
+    producto = models.ForeignKey(
+        'Product',
+        on_delete=models.CASCADE, # Si el producto se elimina, la promoción también
+        related_name='promociones' # Permite acceder a promociones desde un producto
+    )
+    
+    fecha_inicio = models.DateTimeField(default=timezone.now)
+    fecha_fin = models.DateTimeField()
+    
+    # Días de la semana como una cadena de texto (ej. "Lunes,Miércoles,Viernes")
+    dias_semana_aplicables = models.CharField(max_length=100, blank=True, default="")
+    
+    esta_activo = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.nombre} ({self.valor_descuento}{'%' if self.tipo_descuento == 'porcentaje' else '$'}) en {self.producto.name}"

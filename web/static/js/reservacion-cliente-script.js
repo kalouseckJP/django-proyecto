@@ -16,7 +16,7 @@ function reservacion_cliente(event) {
             .then(data => {
                 if (data.success) {
                     alert("Reservación creada correctamente")
-                    window.location.href = "front"
+                    window.location.href = "/front"
                 } else {
                     if(data.error){
                         alert("No hay mesas disponibles para este horario")

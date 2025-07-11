@@ -1,12 +1,14 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from datetime import datetime, date, timedelta, time
-from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product, Reportes, Empleado, Comentario
+from .models import Espacios, Reserva, Cliente, Ad, Mesas, ReservationTable, Product, Reportes, Empleado, Comentario, Promocion
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
 from django.db.models import Sum, Count, F, ExpressionWrapper, IntegerField, Q
 from django.utils.timezone import make_aware
 from django.utils import timezone
+from django.utils.timezone import localtime
+
 import calendar
 import json
 
@@ -38,9 +40,10 @@ def admin(request):
     reportes = Reportes.objects.all()
     empleados = Empleado.objects.all()
     comentarios = Comentario.objects.all()
-    
+    promociones = Promocion.objects.all()
+
     today = date.today().isoformat() # AAAA-MM-DD
-    tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
+    tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
     return render(request, 'admin.html', {
         'reservas': reservas,
         'clientes': clientes,
@@ -51,7 +54,8 @@ def admin(request):
         'productos': productos,
         'reportes': reportes,
         'empleados': empleados,
-        'comentarios': comentarios
+        'comentarios': comentarios,
+        'promociones': promociones,
     })
 
 # *** VISTA FRONT CORREGIDA ***
@@ -84,9 +88,9 @@ def front(request):
         # Añadimos los comentarios a la vista para poder mostrarlos
         'comentarios': Comentario.objects.all().order_by('-fecha_creacion') # Puedes ordenar como quieras
     }
-    
+
     response = render(request, 'front.html', context)
-    
+
     # La línea response.delete_cookie('loggedIn') es solo para el admin.
     # Si quieres que 'front' sea una página para usuarios logueados, no debes borrar 'loggedIn' aquí,
     # a menos que sea una cookie completamente diferente para el admin.
@@ -98,24 +102,24 @@ def front(request):
         # Borramos la cookie 'loggedIn' (si es de admin y no queremos que afecte al cliente)
         # O si es una vista que no debería mantener ninguna sesión activa por defecto.
         # Esto depende de cómo uses la cookie 'loggedIn'
-        response.delete_cookie('loggedIn') 
-    
+        response.delete_cookie('loggedIn')
+
     return response
 
 def hacer_reserva(request):
     today = date.today().isoformat() # AAAA-MM-DD
     now = (datetime.now() + timedelta(minutes=30)).strftime('%H:%M')
-    tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S") 
+    tiemponow = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
     lugares = Espacios.objects.all()
     cliente = Cliente.objects.get(RUT = request.COOKIES.get("user_id"))
     rango = range(1,11)
-        
-    return render(request, 'reservaciones.html', 
-                  {'today': today, 
-                   'now': now, 
-                   'lugares': lugares, 
-                   'tiemponow': tiemponow, 
-                   'rango': rango, 
+
+    return render(request, 'reservaciones.html',
+                  {'today': today,
+                   'now': now,
+                   'lugares': lugares,
+                   'tiemponow': tiemponow,
+                   'rango': rango,
                    "cliente": cliente})
 
 def get_cliente(request, RUT):
@@ -166,7 +170,7 @@ def edit_usuario(request):
     return JsonResponse({"success": False})
 
 def get_reserva(request, id):
-    now = datetime.now().strftime("%Y-%m-%dT%H:%M") 
+    now = datetime.now().strftime("%Y-%m-%dT%H:%M")
     reserva = Reserva.objects.get(id=id)
     data = {
         "id": reserva.id,
@@ -191,7 +195,7 @@ def edit_reserva(request):
         naive_datetime = datetime.fromisoformat(fecha_reserva)
         aware_datetime = make_aware(naive_datetime)
         lugar = Espacios.objects.get(id=request.POST["espacio"])
-        
+
         reserva = Reserva.objects.get(id=id)
         reserva.fecha_reserva = aware_datetime
         reserva.hora_inicio = aware_datetime.time()
@@ -267,11 +271,11 @@ def add_reserva(request):
     if request.method == "POST":
         cliente = Cliente.objects.get(RUT=request.POST["RUT"])
         lugar = Espacios.objects.get(id=request.POST["espacio"])
-        
+
         fecha_reserva = request.POST["fecha_reserva"]
         naive_datetime = datetime.fromisoformat(fecha_reserva)
         aware_datetime = make_aware(naive_datetime)
-        
+
         reserva = Reserva.objects.create(
             RUT=cliente,
             fecha_reserva=aware_datetime,
@@ -364,14 +368,14 @@ def get_horarios(request):
         espacios = Espacios.objects.all()
         fecha = request.POST["fecha"]
         hora = request.POST["hora"]
-        
+
         if fecha and hora:
             combined_str = f"{fecha} {hora}"  # '2025-05-23 14:30'
             combined_datetime = datetime.strptime(combined_str, "%Y-%m-%d %H:%M")
-        
+
         start_range = combined_datetime - timedelta(minutes=30)
         end_range = combined_datetime + timedelta(minutes=30)
-                
+
         espacios = Espacios.objects.annotate(
             overlapping_reservas = Count(
                 'reserva',
@@ -388,8 +392,8 @@ def get_horarios(request):
                 upd_lugar.capacidad_actual = lugares_test.available_spots
                 upd_lugar.save()
             print(lugares_test.available_spots)
-        
-        
+
+
         data = [{
             'id': ele.id,
             'nombre': ele.nombre,
@@ -399,7 +403,7 @@ def get_horarios(request):
             'reservas_actuales': ele.overlapping_reservas,
             'espacio_disponible': ele.available_spots
         }for ele in espacios]
-        
+
         return JsonResponse({'success': True, 'lugares': data})
     return JsonResponse({'success': False})
 
@@ -454,7 +458,7 @@ def usuario(request):
     if not user_rut:
         messages.error(request, "Necesitas iniciar sesión para ver tu perfil.")
         return redirect('login_cliente')
-    
+
     try:
         RUT_obj = Cliente.objects.get(RUT=user_rut)
     except Cliente.DoesNotExist:
@@ -479,10 +483,10 @@ def get_horarios_usuario(request):
         naive_datetime = datetime.fromisoformat(fecha_reserva)
         aware_datetime = make_aware(naive_datetime)
         print(aware_datetime)
-        
+
         start_range = aware_datetime - timedelta(minutes=30)
         end_range = aware_datetime + timedelta(minutes=30)
-                
+
         espacios = Espacios.objects.annotate(
             overlapping_reservas = Count(
                 'reserva',
@@ -500,7 +504,7 @@ def get_horarios_usuario(request):
                 upd_lugar.save()
             print(lugares_test.available_spots)
 
-        
+
         data = [{
             'id': ele.id,
             'nombre': ele.nombre,
@@ -510,7 +514,7 @@ def get_horarios_usuario(request):
             'reservas_actuales': ele.overlapping_reservas,
             'espacio_disponible': ele.available_spots
         }for ele in espacios]
-        
+
         return JsonResponse({'success': True, 'lugares': data})
     return JsonResponse({'success': False})
 
@@ -518,9 +522,9 @@ def add_reserva_mesa(request):
     if request.method == "POST":
         reserva = Reserva.objects.get(RUT = request.POST["RUT"])
         mesa = Mesas.objects.get(id = request.POST["mesa"])
-        
+
         return
-    
+
 def get_reserva_mesa(request, reservaRequest, mesa):
     reserva = Reserva.objects.get(id = reservaRequest)
     mesa = Mesas.objects.get(id = mesa)
@@ -545,7 +549,7 @@ def assign_tables_to_reservation(reservation):
             continue
         else:
             dummy = dummy - 1
-            
+
         # Cantidad máxima que se podría usar de este tipo
         cantidad_usar = min(mesa.cantidadActual, (personas_restantes + mesa.capacidadMesa - 1) // mesa.capacidadMesa)
 
@@ -563,7 +567,7 @@ def assign_tables_to_reservation(reservation):
 
     if asientos_totales_asignados < necesarias:
         raise Exception("No hay suficientes mesas para satisfacer la reservación.")
-    
+
 def assign_tables_to_reservation2(reservation, mesat):
     necesarias = int(reservation.cantidad_personas)
     mesas = mesat
@@ -581,7 +585,7 @@ def assign_tables_to_reservation2(reservation, mesat):
             continue
         else:
             dummy = dummy - 1
-            
+
         # Cantidad máxima que se podría usar de este tipo
         cantidad_usar = min(mesa["cantidadActual"], (personas_restantes + mesa["capacidadMesa"] - 1) // mesa["capacidadMesa"])
 
@@ -648,7 +652,7 @@ def get_h_mesas_admin(request):
     end = provided_datetime + timedelta(minutes=30)
 
     mesas_data = []
-    
+
     # Loop through all mesas to recalculate availability
     for mesa in Mesas.objects.all():
         # Sum all used quantities for this mesa in overlapping reservations
@@ -674,7 +678,7 @@ def get_h_mesas(request):
     datetime_str = request.POST.get('fecha')  # input name from form
     hora = request.POST["hora"]
     datetime_str = f"{datetime_str} {hora}"
-    
+
     if not datetime_str:
         return JsonResponse({'success': False, 'error': 'Missing datetime'}, status=400)
 
@@ -687,7 +691,7 @@ def get_h_mesas(request):
     end = provided_datetime + timedelta(minutes=30)
 
     mesas_data = []
-    
+
     # Loop through all mesas to recalculate availability
     for mesa in Mesas.objects.all():
         # Sum all used quantities for this mesa in overlapping reservations
@@ -695,7 +699,7 @@ def get_h_mesas(request):
             mesa=mesa,
             reservacion__fecha_reserva__range=(start, end)  # adjust to your Reserva datetime field name
         ).aggregate(total_used=Sum('cantidadUsada'))['total_used'] or 0
-        
+
         mesas_data.append({
             'id': mesa.id,
             'capacidadMesa': mesa.capacidadMesa,
@@ -731,15 +735,78 @@ def delete_mesas(request, id):
 def product_list(request):
     offset = int(request.GET.get('offset', 0))
     limit = int(request.GET.get('limit', 10))
+
     products = Product.objects.all()[offset:offset + limit]
 
-    data = [{
-        'id': p.id,
-        'name': p.name,
-        'description': p.description,
-        'price': str(p.price),
-        'image_url': p.image
-    } for p in products]
+    # Obtener la fecha y hora actual en la zona horaria local
+    now = localtime(timezone.now())
+    # Obtener el día de la semana (0=lunes, 6=domingo) como cadena para comparar
+    current_day_of_week = str(now.weekday())
+
+    # Filtrar promociones activas por fecha y que tengan un producto asociado
+    active_promotions = Promocion.objects.filter(
+        esta_activo=True,
+        fecha_inicio__lte=now, # La promoción ya ha empezado
+        fecha_fin__gte=now     # La promoción aún no ha terminado
+    ).select_related('producto') # Pre-carga el producto para evitar consultas adicionales
+
+    # Diccionario para almacenar la mejor promoción para cada producto
+    # {producto_id: promocion_obj}
+    promotions_data = {}
+
+    # Función auxiliar para calcular el precio descontado
+    def calcular_precio(original_price, promo_obj):
+        if promo_obj.tipo_descuento.lower() == 'porcentaje':
+            return original_price * (1 - promo_obj.valor_descuento / 100)
+        elif promo_obj.tipo_descuento.lower() in ['monto', 'monto fijo']:
+            return original_price - promo_obj.valor_descuento
+        return original_price
+
+    # Iterar sobre las promociones activas para encontrar la mejor para cada producto
+    for promo in active_promotions:
+        # Asegurarse de que la promoción esté ligada a un producto y sea aplicable hoy
+        if promo.producto and current_day_of_week in promo.dias_semana_aplicables.split(','):
+            product_id = promo.producto.id
+            original_price = promo.producto.price
+
+            # Calcular el precio de esta promoción
+            current_promo_price = calcular_precio(original_price, promo)
+
+            # Si no hay una promoción registrada para este producto o la actual es mejor
+            if product_id not in promotions_data:
+                promotions_data[product_id] = promo
+            else:
+                existing_promo = promotions_data[product_id]
+                existing_promo_price = calcular_precio(original_price, existing_promo)
+
+                if current_promo_price < existing_promo_price:
+                    promotions_data[product_id] = promo
+
+    # Preparar los datos de los productos con los precios actualizados
+    data = []
+    for p in products:
+        product_data = {
+            'id': p.id,
+            'name': p.name,
+            'description': p.description,
+            'price': str(round(p.price, 2)), # Por defecto, el precio original
+            'image_url': p.image
+        }
+
+        # Si hay una promoción para este producto
+        if p.id in promotions_data:
+            promo = promotions_data[p.id]
+            original_price = p.price
+            discounted_price = calcular_precio(original_price, promo)
+
+            # Asegurarse de que el precio descontado no sea negativo
+            if discounted_price < 0:
+                discounted_price = 0.0
+
+            product_data['original_price'] = str(round(original_price, 2))
+            product_data['price'] = str(round(discounted_price, 2)) # Actualiza el precio con el descuento
+
+        data.append(product_data)
 
     return JsonResponse({'products': data})
 
@@ -764,7 +831,7 @@ def add_productos(request):
         )
         new_row_html = render_to_string("partials/producto_row.html", {"producto": product})
         return JsonResponse({"success": True, "new_row_html": new_row_html})
-    
+
 @csrf_exempt
 def edit_productos(request):
     if request.method == 'POST':
@@ -776,7 +843,7 @@ def edit_productos(request):
         product.image = request.POST['image']
         product.save()
         return JsonResponse({"success": True})
-    
+
 @csrf_exempt
 def delete_productos(request, id):
     if request.method == 'DELETE':
@@ -829,24 +896,24 @@ def add_reporte(request):
             fecha_solo = fecha.date()
             inicio_semana = fecha_solo - timedelta(days = fecha_solo.weekday())
             fin_semana = inicio_semana + timedelta(days = 6)
-            
+
             inicio_datetime = make_aware(datetime.combine(inicio_semana, time.min))
             fin_datetime = make_aware(datetime.combine(fin_semana, time.max))
-            
+
             cuenta = Reserva.objects.filter(
                 fecha_reserva__range=(inicio_datetime, fin_datetime)
             ).count()
-            
+
             reporte = Reportes.objects.create(
                 tipo = 'Semanal',
                 rango_inicio = inicio_semana,
                 rango_final = fin_semana,
                 clientes = cuenta
             )
-            
+
         new_row_html = render_to_string("partials/reporte_row.html", {"reporte": reporte})
         return JsonResponse({"success":True, "new_row_html": new_row_html})
-    
+
 @csrf_exempt
 def delete_reporte(request, id):
     if request.method == 'DELETE':
@@ -888,14 +955,14 @@ def edit_reporte(request):
             fecha_solo = fecha.date()
             inicio_semana = fecha_solo - timedelta(days = fecha_solo.weekday())
             fin_semana = inicio_semana + timedelta(days = 6)
-            
+
             inicio_datetime = make_aware(datetime.combine(inicio_semana, time.min))
             fin_datetime = make_aware(datetime.combine(fin_semana, time.max))
-            
+
             cuenta = Reserva.objects.filter(
                 fecha_reserva__range=(inicio_datetime, fin_datetime)
             ).count()
-            
+
             reporte.rango_inicio = inicio_semana
             reporte.rango_final = fin_semana
             reporte.clientes = cuenta
@@ -990,7 +1057,6 @@ def crear_comentario(request):
             return redirect('front') # O a la URL de listar_comentarios
         else:
             # Si el formulario no es válido, renderiza front.html con los errores y el cliente
-            messages.error(request, "Por favor, corrige los errores en tu comentario.")
             context = {
                 'cliente': cliente_logueado,
                 'form': form, # Pasamos el formulario con los errores
@@ -1012,7 +1078,7 @@ def listar_comentarios(request):
     # En esta vista podríamos listar todos los comentarios,
     # o solo los de un cliente específico si pasamos su ID
     comentarios = Comentario.objects.all().order_by('-fecha_creacion') # Obtiene todos los comentarios
-    
+
     # También podemos pasar el cliente logueado si es necesario para el template
     cliente_logueado = None
     if 'user_id' in request.COOKIES:
@@ -1035,14 +1101,14 @@ def listar_comentarios(request):
 @csrf_exempt
 def editar_comentario(request, comentario_id):
     comentario = get_object_or_404(Comentario, id=comentario_id)
-    
+
     cliente_logueado = None
     if 'user_id' in request.COOKIES:
         try:
             cliente_logueado = Cliente.objects.get(RUT=request.COOKIES.get('user_id'))
         except Cliente.DoesNotExist:
             pass # Si la cookie es inválida, cliente_logueado será None
-    
+
     if comentario.cliente != cliente_logueado:
         messages.error(request, "No tienes permiso para editar este comentario.")
         return redirect('front')
@@ -1062,7 +1128,7 @@ def editar_comentario(request, comentario_id):
 @csrf_exempt
 def eliminar_comentario(request, comentario_id):
     comentario = get_object_or_404(Comentario, id=comentario_id)
-    
+
     # Verificamos el cliente logueado
     cliente_logueado = None
     if 'user_id' in request.COOKIES:
@@ -1070,7 +1136,7 @@ def eliminar_comentario(request, comentario_id):
             cliente_logueado = Cliente.objects.get(RUT=request.COOKIES.get('user_id'))
         except Cliente.DoesNotExist:
             pass
-            
+
     # ¡SEGURIDAD! Verificamos que el cliente sea el dueño
     if comentario.cliente != cliente_logueado:
         messages.error(request, "No tienes permiso para eliminar este comentario.")
@@ -1081,6 +1147,175 @@ def eliminar_comentario(request, comentario_id):
         comentario.delete()
         messages.success(request, "El comentario ha sido eliminado.")
         return redirect('front')
-    
+
     # Si es un GET, mostramos la página de confirmación
     return render(request, 'eliminar_comentario.html', {'comentario': comentario})
+
+
+@csrf_exempt
+
+def add_edit_promocion(request):
+    if request.method == "POST":
+        promocion_id = request.POST.get("id") # Este será el ID si estamos editando, o vacío si estamos creando
+
+        # Validación de campos requeridos
+        nombre = request.POST.get("nombre")
+        descripcion = request.POST.get("descripcion")
+        tipo_descuento = request.POST.get("tipo_descuento")
+        valor_descuento_str = request.POST.get("valor_descuento")
+        fecha_inicio_str = request.POST.get("fecha_inicio")
+        fecha_fin_str = request.POST.get("fecha_fin")
+        producto_id = request.POST.get("producto_id")
+
+        if not nombre or not nombre.strip():
+            return JsonResponse({"success": False, "error": "El nombre es un campo requerido."})
+        if not descripcion or not descripcion.strip():
+            return JsonResponse({"success": False, "error": "La descripción es un campo requerido."})
+        if not tipo_descuento or not tipo_descuento.strip():
+            return JsonResponse({"success": False, "error": "El tipo de descuento es un campo requerido."})
+        if not valor_descuento_str or not valor_descuento_str.strip():
+            return JsonResponse({"success": False, "error": "El valor de descuento es un campo requerido."})
+        if not fecha_inicio_str or not fecha_inicio_str.strip():
+            return JsonResponse({"success": False, "error": "La fecha de inicio es un campo requerido."})
+        if not fecha_fin_str or not fecha_fin_str.strip():
+            return JsonResponse({"success": False, "error": "La fecha de fin es un campo requerido."})
+        if not producto_id or not producto_id.strip():
+            return JsonResponse({"success": False, "error": "El producto es un campo requerido."})
+
+        try:
+            valor_descuento = float(valor_descuento_str)
+            if tipo_descuento.lower() == 'porcentaje' and (valor_descuento <= 0 or valor_descuento > 100):
+                return JsonResponse({"success": False, "error": "El porcentaje de descuento debe ser mayor a 0 y menor o igual a 100."})
+
+            if tipo_descuento == 'Monto' and valor_descuento <= 0:
+                return JsonResponse({"success": False, "error": "El monto de descuento debe ser mayor a 0."})
+
+            fecha_inicio = make_aware(datetime.fromisoformat(fecha_inicio_str))
+            fecha_fin = make_aware(datetime.fromisoformat(fecha_fin_str))
+
+            now_aware = timezone.localtime(timezone.now())
+
+            #if fecha_inicio.date() <= now_aware.date():
+             #   return JsonResponse({"success": False, "error": "La fecha de inicio no puede ser anterior a hoy."})
+
+            if fecha_fin < fecha_inicio:
+                return JsonResponse({"success": False, "error": "La fecha de fin no puede ser anterior a la fecha de inicio."})
+            if fecha_fin < now_aware:
+                return JsonResponse({"success": False, "error": "La fecha de fin no puede ser anterior a hoy."})
+
+            if promocion_id:
+                # Estamos editando una promoción existente
+                promocion = Promocion.objects.get(id=promocion_id)
+            else:
+                # Estamos creando una nueva promoción
+                promocion = Promocion()
+
+            # Asignar los datos del formulario a la instancia de la promoción
+            promocion.nombre = nombre
+            promocion.descripcion = descripcion
+            promocion.tipo_descuento = tipo_descuento
+            promocion.valor_descuento = valor_descuento
+
+
+            # Obtener el producto. Asegúrate de que el ID del producto sea válido.
+            promocion.producto = Product.objects.get(id=producto_id)
+
+            # Convertir las fechas de string a objetos datetime conscientes de la zona horaria
+            promocion.fecha_inicio = fecha_inicio
+            promocion.fecha_fin = fecha_fin
+
+            # Manejar los días de la semana
+            # request.POST.getlist() se usa para obtener todos los valores de checkboxes con el mismo nombre
+            dias_seleccionados = request.POST.getlist("dias_semana_aplicables")
+            if not dias_seleccionados:
+                return JsonResponse({"success": False, "error": "Debes seleccionar al menos un día de la semana."})
+
+            # Unir los días seleccionados en una sola cadena separados por comas
+            promocion.dias_semana_aplicables = ",".join(dias_seleccionados)
+
+            # Manejar el checkbox 'esta_activo'
+            # Los checkboxes no envían valor si no están marcados, así que comprobamos si existe en POST
+            promocion.esta_activo = "esta_activo" in request.POST
+
+            promocion.save()
+
+            # Renderizar una fila parcial para actualizar la tabla de promociones en el frontend
+            # Necesitaremos una plantilla 'partials/promocion_row.html' más adelante
+            new_row_html = render_to_string("partials/promocion_row.html", {"promocion": promocion})
+
+            return JsonResponse({"success": True, "promocion_id": promocion.id, "new_row_html": new_row_html})
+
+        except Product.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Producto no encontrado."})
+        except ValueError as ve:
+            return JsonResponse({"success": False, "error": f"Error en el formato de datos: {ve}"})
+        except Exception as e:
+            # Capturar cualquier otro error y devolver una respuesta JSON con el error
+            print(f"Error al guardar promoción: {e}")
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Método no permitido."})
+
+
+# --- Vistas para Obtener y Eliminar (parte del CRUD) ---
+
+def get_promocion(request, id):
+    try:
+        promocion = Promocion.objects.get(id=id)
+        data = {
+            "id": promocion.id,
+            "nombre": promocion.nombre,
+            "descripcion": promocion.descripcion,
+            "tipo_descuento": promocion.tipo_descuento,
+            "valor_descuento": str(promocion.valor_descuento), # Convertir Decimal a string
+            "producto_id": promocion.producto.id if promocion.producto else None, # ID del producto
+            # Formatear fechas para que el input type="datetime-local" las entienda
+            "fecha_inicio": promocion.fecha_inicio.isoformat(timespec='minutes'),
+            "fecha_fin": promocion.fecha_fin.isoformat(timespec='minutes'),
+            "dias_semana_aplicables": promocion.dias_semana_aplicables, # Ya es una cadena, lista para usar
+            "esta_activo": promocion.esta_activo,
+        }
+        return JsonResponse(data)
+    except Promocion.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Promoción no encontrada."}, status=404)
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+@csrf_exempt
+def delete_promocion(request, id):
+    if request.method == "DELETE": # Usar DELETE para eliminación es una buena práctica RESTful
+        try:
+            promocion = Promocion.objects.get(id=id)
+            promocion.delete()
+            return JsonResponse({"success": True, "id": id})
+        except Promocion.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Promoción no encontrada."}, status=404)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+    return JsonResponse({"success": False, "error": "Método no permitido."}, status=405)
+
+
+# --- Vista para Listar Promociones (Integración con la vista 'admin') ---
+
+def get_promociones_list(request):
+    """
+    Retorna una lista de todas las promociones para ser mostradas en la tabla de administración.
+    Podría tener filtros si la lista se hace muy larga.
+    """
+    promociones = Promocion.objects.all().select_related('producto').order_by('-fecha_inicio')
+
+    data = []
+    for promo in promociones:
+        data.append({
+            "id": promo.id,
+            "nombre": promo.nombre,
+            "descripcion": promo.descripcion,
+            "tipo_descuento": promo.tipo_descuento,
+            "valor_descuento": str(promo.valor_descuento),
+            "producto_nombre": promo.producto.name if promo.producto else "General", # Nombre del producto
+            "fecha_inicio": promo.fecha_inicio.strftime("%Y-%m-%d %H:%M"), # Formato legible para tabla
+            "fecha_fin": promo.fecha_fin.strftime("%Y-%m-%d %H:%M"),
+            "dias_semana_aplicables": promo.dias_semana_aplicables,
+            "esta_activo": promo.esta_activo,
+        })
+    return JsonResponse({"success": True, "promociones": data})

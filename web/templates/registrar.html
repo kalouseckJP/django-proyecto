@@ -50,10 +50,10 @@
                         <label for="password">Contraseña</label>
                         <input type="password" name="password" id="password" autocomplete="off" placeholder="Constraseña">
                     </div>
-                    <a href="{{ "front" }}">Cancelar</a>
+                    <a href="{% url 'front' %}">Cancelar</a>
                 </div>
             </form>
         </div>
-        <a id="registro" href={{ 'login_cliente' }}>Inicio Sesion</a>
+        <a id="registro" href={% url 'login_cliente' %}>Inicio Sesion</a>
     </body>
 </html>

@@ -23,8 +23,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('admin', views.admin, name='admin'),
     path('admin/', views.admin, name='admin'),
-    path('front', views.front, name='front'),
-    path('reservaciones', views.hacer_reserva, name='reservaciones'),
+    path('front/', views.front, name='front'),
+    path('reservaciones/', views.hacer_reserva, name='reservaciones'),
     
     path('get_cliente/<str:RUT>/', views.get_cliente, name='get_cliente'),
     path('edit_cliente/', views.edit_cliente, name='edit_cliente'),
@@ -46,13 +46,13 @@ urlpatterns = [
     
     path('add_reserva_cliente/', views.add_reserva_cliente, name='add_reserva_cliente'),
     path('add_cliente_registro/', views.add_cliente_registro, name='add_cliente_registro'),
-    path('login_cliente', views.login_cliente, name='login_cliente'),
+    path('login_cliente/', views.login_cliente, name='login_cliente'),
     
     path('get_horarios/',views.get_horarios, name='get_horarios'),
-    path('registro', views.registro, name='registro'),
+    path('registro/', views.registro, name='registro'),
     path("validacion_cliente/", views.validacion_cliente, name="validacion_cliente"),
     
-    path('usuario', views.usuario, name='usuario'),
+    path('usuario/', views.usuario, name='usuario'),
     path('edit_usuario/', views.edit_usuario, name='edit_usuario'),
     path("get_horarios_usuario/", views.get_horarios_usuario, name='get_horarios_usuario'),
     
@@ -90,4 +90,10 @@ urlpatterns = [
     # --- AÑADIDO: Rutas de autenticación de Django ---
     # Esto incluye paths como /accounts/login/, /accounts/logout/, /accounts/password_change/, etc.
     path('accounts/', include('django.contrib.auth.urls')),
+    
+    path('promociones/add_edit/', views.add_edit_promocion, name='add_promocion'),
+    path('get_promocion/<int:id>/', views.get_promocion, name='get_promocion'),
+    path('delete_promocion/<int:id>/', views.delete_promocion, name='delete_promocion'),
+    path('promociones/list/', views.get_promociones_list, name='get_promociones_list'),
+
 ]

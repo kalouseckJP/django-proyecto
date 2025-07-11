@@ -45,6 +45,9 @@
                     <li>
                         <button type="button" value="Empleados">Empleados</button>
                     </li>
+                    <li>
+                        <button type="button" value="Promociones">Promociones</button>
+                    </li>
                 </ul>
             </nav>
             <div class="admin-content">
@@ -359,7 +362,65 @@
                     </table>
                 </div>
             </div>
+<div id="promociones-content" class="admin-content tablas">
+    <div id="admin-content-header">
+        <h3>Ofertas y Promociones</h3>
+        <button type="button" id="add" data-type="promocion">
+            <i class="bi bi-plus-circle"></i> Agregar Promoción
+        </button>
+    </div>
+    <div class="reservas" id="admin-content-titles">
+        <table class="reservas-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Producto</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Días</th>
+                    <th>Estado</th>
+                    <th class="tabla-elem-final">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="reservas-body">
+                {% for promocion in promociones %}
+                <tr>
+                    <td>{{ promocion.id }}</td>
+                    <td>{{ promocion.nombre }}</td>
+                    <td>{{ promocion.descripcion }}</td>
+                    <td>{{ promocion.get_tipo_descuento_display }}</td>
+                    <td>{{ promocion.valor_descuento }}</td>
+                    <td>{{ promocion.producto.name }}</td>
+                    <td>{{ promocion.fecha_inicio|date:"d/m/Y H:i" }}</td>
+                    <td>{{ promocion.fecha_fin|date:"d/m/Y H:i" }}</td>
+                    <td>{{ promocion.dias_semana_aplicables }}</td>
+                    <td>
+                        {% if promocion.esta_activo %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Activa
+                        {% else %}
+                            <i class="bi bi-x-circle-fill text-danger"></i> Inactiva
+                        {% endif %}
+                    </td>
+                    <td class="tabla-elem-final">
+                        <button type="button" class="edit-button" data-id="{{ promocion.id }}" data-type="promocion">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </button>
+                        <button type="button" class="delete-button" data-id="{{ promocion.id }}" data-type="promocion">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
         </div>
+
         <input id="admin-salida" type="submit" value="Salir" onclick="window.location.href='{% url "index" %}'">
 
         <!-- Modal para editar -->
@@ -378,15 +439,75 @@
         </div>
 
         <!-- Modal para añadir -->
-        <div id="add-modal" class="modal">
+<div id="add-modal" class="modal">
             <div class="modal-content">
                 <span class="close-button" onclick="closeAddModal()"><i class="bi bi-x"></i></span>
                 <h3 id="add-modal-title">Agregar Nuevo</h3>
                 <form id="add-form">
                     {% csrf_token %}
                     <div id="add-modal-fields">
-                        <!-- Aqui se añaden los campos -->
-                    </div>
+                        <div id="promocion-form-content">
+                            <input type="hidden" id="promocion_id" name="id" value="">
+
+                            <div>
+                                <label for="promocion_nombre">Nombre de la Promoción:</label>
+                                <input type="text" id="promocion_nombre" name="nombre" required>
+                            </div>
+                            <br>
+                            <div>
+                                <label for="promocion_descripcion">Descripción:</label>
+                                <textarea id="promocion_descripcion" name="descripcion" rows="3"></textarea>
+                            </div>
+                            <br>
+                            <div>
+                                <label for="promocion_tipo_descuento">Tipo de Descuento:</label>
+                                <select id="promocion_tipo_descuento" name="tipo_descuento" required>
+                                    <option value="porcentaje">Porcentaje</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div>
+                                <label for="promocion_valor_descuento">Porcentaje de descuento:</label>
+                                <input type="number" step="0.01" id="promocion_valor_descuento" name="valor_descuento" required min="0">
+                            </div>
+                            <br>
+                            <div>
+                                <label for="promocion_producto">Producto Aplicable:</label>
+                                <select id="promocion_producto" name="producto_id" required>
+                                    {% for prod in productos %}
+                                        <option value="{{ prod.id }}">{{ prod.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <br>
+                            <div>
+                                <label for="promocion_fecha_inicio">Fecha y Hora de Inicio:</label>
+                                <input type="datetime-local" id="promocion_fecha_inicio" name="fecha_inicio" required>
+                            </div>
+                            <br>
+                            <div>
+                                <label for="promocion_fecha_fin">Fecha y Hora de Término:</label>
+                                <input type="datetime-local" id="promocion_fecha_fin" name="fecha_fin" required>
+                            </div>
+                            <br>
+                            <div>
+                                <label>Días de la Semana Aplicables:</label><br>
+                                <input type="checkbox" id="dia_lunes" name="dias_semana_aplicables" value="1"> <label for="dia_lunes">Lunes</label><br>
+                                <input type="checkbox" id="dia_martes" name="dias_semana_aplicables" value="2"> <label for="dia_martes">Martes</label><br>
+                                <input type="checkbox" id="dia_miercoles" name="dias_semana_aplicables" value="3"> <label for="dia_miercoles">Miércoles</label><br>
+                                <input type="checkbox" id="dia_jueves" name="dias_semana_aplicables" value="4"> <label for="dia_jueves">Jueves</label><br>
+                                <input type="checkbox" id="dia_viernes" name="dias_semana_aplicables" value="5"> <label for="dia_viernes">Viernes</label><br>
+                                <input type="checkbox" id="dia_sabado" name="dias_semana_aplicables" value="6"> <label for="dia_sabado">Sábado</label><br>
+                                <input type="checkbox" id="dia_domingo" name="dias_semana_aplicables" value="7"> <label for="dia_domingo">Domingo</label>
+                            </div>
+                            <br>
+                            <div>
+                                <input type="checkbox" id="promocion_esta_activo" name="esta_activo" value="true">
+                                <label for="promocion_esta_activo">Activa</label>
+                            </div>
+                            <br>
+                        </div>
+                        </div>
                     <button type="submit">Agregar</button>
                 </form>
             </div>
