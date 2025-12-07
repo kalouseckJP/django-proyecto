@@ -15,3 +15,7 @@ python.exe manage.py runserver
 ```
 
 Las paginas deberian cargar en localhost:8000
+
+Las credenciales son:  
+Usuario: admin  
+Contraseña: 1234  
