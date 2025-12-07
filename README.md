@@ -4,7 +4,7 @@
 ***probablemente pida cambiar una configuración***  
 
 3.- Instalar Django en el ambiente virtual: `pip install Django`  
-4.- Instalar jwt en el ambiente virtual: `pip install jwt` 
+4.- Instalar jwt en el ambiente virtual: `pip install jwt`  
 *Si da error, ir a las variables de entornce y en variables de sistema borrar los que diga posgreSQL*  
 
 Con eso deberia funcionar, para iniciarlo hacen el proyecto  
